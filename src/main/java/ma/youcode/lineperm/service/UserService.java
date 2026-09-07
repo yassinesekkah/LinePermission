@@ -20,4 +20,28 @@ public class UserService {
     public User getUser(String login){
         return users.get(login);
     }
+
+    public boolean createUser(String login, String passwordHash){
+
+        if(userExists(login)){
+            return false;
+        }
+
+        User user = new User(login, passwordHash);
+
+        addUser(user);
+
+        return true;
+    }
+
+    public boolean login(String login, String passwordHash){
+
+        if(!userExists(login)){
+            return false;
+        }
+
+        User user = getUser(login);
+
+        return user.getPasswoordHash().equals(passwordHash);
+    }
 }

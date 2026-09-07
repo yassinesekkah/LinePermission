@@ -26,5 +26,15 @@ public class Main{
 
        System.out.println(userFound.getLogin());
        System.out.println(userFound.getPasswoordHash());
+
+       userService.createUser("ahmed@gmail.com", "1234321");
+
+       boolean ifouf = userService.userExists("ahmed@gmail.com");
+
+       System.out.println(ifouf);
+
+        boolean islogin =  userService.login("ahmed@gmail.com", "1234321");
+
+       System.out.println(islogin);
     }
 }
