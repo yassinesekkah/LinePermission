@@ -5,15 +5,15 @@ import java.util.Scanner;
 import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.service.UserService;
 
-public class ConsoleApp{
+public class ConsoleApp {
 
     private final Scanner scanner = new Scanner(System.in);
     private final UserService userService = new UserService();
     private User currentUser = null;
 
-    public void logout(){
+    private void logout() {
 
-        if(currentUser == null){
+        if (currentUser == null) {
 
             System.out.println("Aucun utilisateur connecte");
             return;
@@ -23,45 +23,66 @@ public class ConsoleApp{
         System.out.println("Deconnexion reussie");
     }
 
+    private boolean isValidLogin(String login) {
 
-    public void run(){
+        return !login.isEmpty() && !login.contains(" ") && !login.contains(":");
+    }
+
+    public void run() {
+
+        System.out.println("Bienvenue dans LinePermission");
+        System.out.println("Commandes disponibles : signup, login, logout, exit");
 
         while (true) {
 
-            if(currentUser == null){
+            if (currentUser == null) {
                 System.out.print("linperm> ");
-            }
-            else{
+            } else {
                 System.out.print(currentUser.getLogin() + "@linperm>");
             }
-            
-            String command = scanner.nextLine();
-            
+
+            String command = scanner.nextLine().trim().toLowerCase();
+
             switch (command) {
 
                 case "signup":
-                    
-                    System.out.println("Login: ");
+
+                    if (currentUser != null) {
+                        System.out.println("Un utilisateur est deja connecte");
+                        break;
+                    }
+
+                    System.out.print("Login: ");
                     String login = scanner.nextLine();
 
-                    System.out.println("mot de passe: ");
+                    System.out.print("mot de passe: ");
                     String password = scanner.nextLine();
+
+                    if (!isValidLogin(login)) {
+                        System.out.println("Login invalid");
+                        break;
+                    }
+
+                    if (password.isEmpty()) {
+                        System.out.println("Le mot de passe ne peut pas être vide");
+                        break;
+                    }
 
                     boolean created = userService.createUser(login, password);
 
-                    if(created){
+                    if (created) {
                         System.out.println("compte cree");
-                    }
-                    else{
+                    } else {
                         System.out.println("Login deja pris");
                     }
 
                     break;
 
                 case "login":
-                    
-                    if(currentUser != null){
+
+                    if (currentUser != null) {
                         System.out.println("Un utilisateur est deja connecte");
+                        break;
                     }
 
                     System.out.print("login : ");
@@ -70,27 +91,31 @@ public class ConsoleApp{
                     System.out.print("Mot de passe : ");
                     String pass = scanner.nextLine();
 
+                    if (!isValidLogin(log)) {
+                        System.out.println("Login invalide");
+                        break;
+                    }
+
                     boolean logged = userService.login(log, pass);
 
-                    if(logged){
+                    if (logged) {
                         currentUser = userService.getUser(log);
                         System.out.println("Connexion reussie");
-                    }
-                    else{
+                    } else {
                         System.out.println("Identifiants incorrects");
                     }
                     break;
 
                 case "logout":
-                    
+
                     logout();
                     break;
 
                 case "exit":
                     return;
-            
+
                 default:
-                    if(!command.isEmpty()){
+                    if (!command.isEmpty()) {
                         System.out.println("Commande inconue");
                     }
                     break;
