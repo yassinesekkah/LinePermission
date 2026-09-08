@@ -1,6 +1,8 @@
 package ma.youcode.lineperm;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -15,20 +17,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // ConsoleApp app = new ConsoleApp();
-        // app.run();
+        ConsoleApp app = new ConsoleApp();
+        app.run();
 
-        UserService service = new UserService();
-
-        service.createUser("yassine", "123");
-
-        User user = service.getUser("yassine");
-
-        System.out.println(user.getPasswordHash());
-
-        System.out.println(
-        BCrypt.checkpw("123", user.getPasswordHash())
-);
+        
 
        
     }
