@@ -15,7 +15,7 @@ public class User {
         return login;
     }
 
-    public String getPasswoordHash(){
+    public String getPasswordHash(){
         return passwordHash;
     }
 }
