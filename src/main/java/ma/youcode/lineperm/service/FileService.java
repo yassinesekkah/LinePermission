@@ -13,6 +13,11 @@ public class FileService {
         return files.containsKey(name);
     }
 
+    public File getFile(String name){
+        
+        return files.get(name);
+    }
+
     public boolean createFile(String name, String owner){
 
         if(fileExists(name)){
