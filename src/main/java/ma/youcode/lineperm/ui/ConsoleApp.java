@@ -112,6 +112,7 @@ public class ConsoleApp {
                     break;
 
                 case "exit":
+                    System.out.println("Au revoir!");
                     return;
 
                 default:
