@@ -20,6 +20,10 @@ public class Main {
         ConsoleApp app = new ConsoleApp();
         app.run();
 
+        // UserService userService = new UserService();
+
+        // userService.loadUsers();
+
         
 
        

@@ -2,13 +2,14 @@ package ma.youcode.lineperm.ui;
 
 import java.util.Scanner;
 
+import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.service.UserService;
 
 public class ConsoleApp{
 
     private Scanner scanner = new Scanner(System.in);
     private final UserService userService = new UserService();
-
+    private User curretUser = null;
 
 
     public void run(){
@@ -40,7 +41,21 @@ public class ConsoleApp{
                     break;
 
                 case "login":
-                    System.out.println("login");
+                    System.out.print("login : ");
+                    String log = scanner.nextLine();
+
+                    System.out.print("Mot de passe : ");
+                    String pass = scanner.nextLine();
+
+                    boolean logged = userService.login(log, pass);
+
+                    if(logged){
+                        curretUser = userService.getUser(log);
+                        System.out.println("Connexion reussie");
+                    }
+                    else{
+                        System.out.println("Identifiants incorrects");
+                    }
                     break;
 
                 case "logout":
