@@ -1,6 +1,6 @@
 package ma.youcode.lineperm.model;
 
-public class Fichier {
+public class File{
 
     private final String name;
     private String content;
@@ -8,7 +8,7 @@ public class Fichier {
     private final String ownerPermissions;
     private String othersPermissions;
 
-    public Fichier(String name, String owner){
+    public File(String name, String owner){
 
         this.name = name;
         this.owner = owner;
