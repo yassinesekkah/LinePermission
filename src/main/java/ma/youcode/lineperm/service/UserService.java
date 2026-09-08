@@ -107,11 +107,10 @@ public class UserService {
                 addUser(user);
             }
 
-
-
         }catch(IOException e){
 
         }
 
     }
+
 }

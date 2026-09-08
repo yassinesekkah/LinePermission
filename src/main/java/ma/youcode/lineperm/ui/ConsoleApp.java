@@ -7,15 +7,33 @@ import ma.youcode.lineperm.service.UserService;
 
 public class ConsoleApp{
 
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
     private final UserService userService = new UserService();
-    private User curretUser = null;
+    private User currentUser = null;
+
+    public void logout(){
+
+        if(currentUser == null){
+
+            System.out.println("Aucun utilisateur connecte");
+            return;
+        }
+
+        currentUser = null;
+        System.out.println("Deconnexion reussie");
+    }
 
 
     public void run(){
 
         while (true) {
-            System.out.print("linperm> ");
+
+            if(currentUser == null){
+                System.out.print("linperm> ");
+            }
+            else{
+                System.out.print(currentUser.getLogin() + "@linperm>");
+            }
             
             String command = scanner.nextLine();
             
@@ -41,6 +59,11 @@ public class ConsoleApp{
                     break;
 
                 case "login":
+                    
+                    if(currentUser != null){
+                        System.out.println("Un utilisateur est deja connecte");
+                    }
+
                     System.out.print("login : ");
                     String log = scanner.nextLine();
 
@@ -50,7 +73,7 @@ public class ConsoleApp{
                     boolean logged = userService.login(log, pass);
 
                     if(logged){
-                        curretUser = userService.getUser(log);
+                        currentUser = userService.getUser(log);
                         System.out.println("Connexion reussie");
                     }
                     else{
@@ -59,7 +82,8 @@ public class ConsoleApp{
                     break;
 
                 case "logout":
-                    System.out.println("logout");
+                    
+                    logout();
                     break;
 
                 case "exit":
