@@ -1,8 +1,10 @@
 package ma.youcode.lineperm.ui;
 
+import ma.youcode.lineperm.model.File;
 import java.util.Scanner;
 
 import ma.youcode.lineperm.model.User;
+import ma.youcode.lineperm.service.FileService;
 import ma.youcode.lineperm.service.UserService;
 
 public class ConsoleApp {
@@ -10,6 +12,7 @@ public class ConsoleApp {
     private final Scanner scanner = new Scanner(System.in);
     private final UserService userService = new UserService();
     private User currentUser = null;
+    private final FileService fileService = new FileService();
 
     private void logout() {
 
@@ -26,6 +29,25 @@ public class ConsoleApp {
     private boolean isValidLogin(String login) {
 
         return !login.isEmpty() && !login.contains(" ") && !login.contains(":");
+    }
+
+    private boolean isConnected(){
+        if(currentUser == null){
+            System.out.println("Vous devez etre connecte");
+            return false;
+        };
+        return true;
+    }
+
+    private void listFiles(){
+
+        System.out.println("===> Tous les fichiers <===");
+
+        for(File file : fileService.getAllFiles()){
+                System.out.println(file.getName());
+        }
+
+        System.out.println("==========================");
     }
 
     public void run() {
@@ -112,8 +134,38 @@ public class ConsoleApp {
                     break;
 
                 case "exit":
+                
                     System.out.println("Au revoir!");
                     return;
+
+                case "touch":
+
+                    if(!isConnected()){
+                        break;
+                    }
+
+                    System.out.print("Le nom de fichier : " );
+                    String fileName = scanner.nextLine().trim();
+
+                    boolean createdFile = fileService.createFile(fileName, currentUser.getLogin());
+
+                    if(createdFile){
+                        System.out.println("Fichier cree");
+                    }
+                    else{
+                        System.out.println("Ce nom de fichier est deja utilise");
+                    }
+                    break;
+
+                case "ls":
+
+                    if(!isConnected()){
+                        break;
+                    }
+
+                    listFiles();
+
+                    break;
 
                 default:
                     if (!command.isEmpty()) {
@@ -121,7 +173,6 @@ public class ConsoleApp {
                     }
                     break;
             }
-
         }
     }
 }

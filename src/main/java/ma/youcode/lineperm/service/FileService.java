@@ -1,5 +1,6 @@
 package ma.youcode.lineperm.service;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,5 +32,10 @@ public class FileService {
         return true;
 
     }
+
+    public Collection<File> getAllFiles(){
+
+        return files.values();
+    }   
     
 }
