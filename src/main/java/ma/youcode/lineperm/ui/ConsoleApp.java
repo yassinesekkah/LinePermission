@@ -44,7 +44,13 @@ public class ConsoleApp {
         System.out.println("===> Tous les fichiers <===");
 
         for(File file : fileService.getAllFiles()){
-                System.out.println(file.getName());
+
+                String ownerPermissions = file.getOwnerPermissions();
+                String otherPermissions = file.getOthersPermissions();
+                String fileName = file.getName();
+
+                
+                System.out.println(ownerPermissions + "|" + otherPermissions + " " + fileName);
         }
 
         System.out.println("==========================");
