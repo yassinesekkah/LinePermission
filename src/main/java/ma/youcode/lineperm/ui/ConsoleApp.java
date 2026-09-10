@@ -79,8 +79,18 @@ public class ConsoleApp {
 
     }
 
-    private nano(){
+    private void nano(){
+        System.out.print("Le nom de fichier: ");
+        String name = scanner.nextLine();
 
+        if(!fileService.fileExists(name)){
+            System.out.println("fichier introuvable");
+            return;
+        }
+
+        File file = fileService.getFile(name);
+
+        System.out.print("");
     }
 
     public void run() {

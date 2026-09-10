@@ -1,23 +1,36 @@
 package ma.youcode.lineperm.service;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import ma.youcode.lineperm.model.File;
+import ma.youcode.lineperm.model.FichierProtege;
 
 public class FileService {
 
-    private Map<String, File> files = new HashMap<>();
+    private Map<String, FichierProtege> files = new HashMap<>();
 
     public boolean fileExists(String name){
         return files.containsKey(name);
     }
 
-    public File getFile(String name){
+    public FichierProtege getFile(String name){
         
         return files.get(name);
     }
+
+    public boolean isFileNameValid(String name){
+        if(name.contains("/") || name.contains("\\") || name.contains("..")){
+            return false;
+        }
+        return true;
+    }
+
+    
 
     public boolean createFile(String name, String owner){
 
@@ -25,47 +38,61 @@ public class FileService {
             return false;
         }
 
-        File file = new File(name, owner);
+        if(!isFileNameValid(name)){
+            return false;
+        }
 
-        files.put(name, file);
+        Path dataDir = Path.of("data");
+        Path filePath = dataDir.resolve(name);
 
-        return true;
+        try{
+            Files.createDirectories(dataDir);
+            Files.createFile(filePath);
+
+            FichierProtege fichier = new FichierProtege(name, owner);
+            files.put(name, fichier);
+
+            return true;
+
+        }catch(IOException e){
+            return false;
+        }
 
     }
 
-    public Collection<File> getAllFiles(){
+    public Collection<FichierProtege> getAllFiles(){
 
         return files.values();
     }
 
-    public boolean canRead(File file, String login){
+    public boolean canRead(FichierProtege file, String login){
 
         String owner = file.getOwner();
-        String otherPermissions = file.getOthersPermissions();
+        // String otherPermissions = file.getOthersPermissions();
 
         if(login.equals(owner)){
             return true;
         }
 
-        if(otherPermissions.contains("r")){
+        if(file.getOthersCanRead()){
             return true;
         }
         
         return false;
     }
 
-    public boolean canWrite(File file, String login){
+    public boolean canWrite(FichierProtege fichier, String login){
 
-        String fileOwner = file.getOwner();
+        String fileOwner = fichier.getOwner();
 
-        String otherPermissions = file.getOthersPermissions();
+        // String otherPermissions = file.getOthersPermissions();
 
         
         if(login.equals(fileOwner)){
             return true;
         }
 
-        if(otherPermissions.contains("w")){
+        if(fichier.getOthersCanWrite()){
             return true;
         }
 
@@ -74,19 +101,19 @@ public class FileService {
 
     public boolean writeFile(String fileName, String login, String newContent){
 
-        File file = getFile(fileName);
+        FichierProtege fichier = getFile(fileName);
 
-        if(file == null){
+        if(fichier == null){
             return false;
         }
 
-        boolean canWrite = canWrite(file, login);
+        boolean canWrite = canWrite(fichier, login);
 
         if(!canWrite){
             return false;
         }
 
-        file.setContent(newContent);
+        fichier.setContent(newContent);
 
         return true;
 
