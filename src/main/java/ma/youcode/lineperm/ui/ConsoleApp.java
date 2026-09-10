@@ -49,11 +49,38 @@ public class ConsoleApp {
                 String otherPermissions = file.getOthersPermissions();
                 String fileName = file.getName();
 
-                
+
                 System.out.println(ownerPermissions + "|" + otherPermissions + " " + fileName);
         }
 
         System.out.println("==========================");
+    }
+
+    private void cat(){
+
+        System.out.println("Nom du fichier : ");
+        String name = scanner.nextLine();
+
+        File file = fileService.getFile(name);
+
+        if(file == null){
+            System.out.println("Fichier introuvable");
+            return;
+        }
+
+        boolean canRead = fileService.canRead(file, currentUser.getLogin());
+
+        if(!canRead){
+            System.out.println("Acces refuse");
+            return;
+        }
+
+        System.out.println(file.getContent());
+
+    }
+
+    private nano(){
+
     }
 
     public void run() {
@@ -164,13 +191,25 @@ public class ConsoleApp {
                     break;
 
                 case "ls":
+                    if(!isConnected()){
+                        break;
+                    }
+                    listFiles();
+                    break;
 
+                case "cat":
+                    if(!isConnected()){
+                        break;
+                    }
+                    cat();
+                    break;
+
+                case "nano":
                     if(!isConnected()){
                         break;
                     }
 
-                    listFiles();
-
+                    nano();
                     break;
 
                 default:

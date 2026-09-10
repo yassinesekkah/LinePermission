@@ -36,6 +36,60 @@ public class FileService {
     public Collection<File> getAllFiles(){
 
         return files.values();
-    }   
+    }
+
+    public boolean canRead(File file, String login){
+
+        String owner = file.getOwner();
+        String otherPermissions = file.getOthersPermissions();
+
+        if(login.equals(owner)){
+            return true;
+        }
+
+        if(otherPermissions.contains("r")){
+            return true;
+        }
+        
+        return false;
+    }
+
+    public boolean canWrite(File file, String login){
+
+        String fileOwner = file.getOwner();
+
+        String otherPermissions = file.getOthersPermissions();
+
+        
+        if(login.equals(fileOwner)){
+            return true;
+        }
+
+        if(otherPermissions.contains("w")){
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean writeFile(String fileName, String login, String newContent){
+
+        File file = getFile(fileName);
+
+        if(file == null){
+            return false;
+        }
+
+        boolean canWrite = canWrite(file, login);
+
+        if(!canWrite){
+            return false;
+        }
+
+        file.setContent(newContent);
+
+        return true;
+
+    }
     
 }
