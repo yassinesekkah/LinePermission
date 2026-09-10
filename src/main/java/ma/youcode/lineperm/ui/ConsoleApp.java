@@ -6,6 +6,7 @@ import java.util.Scanner;
 import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.service.FileService;
 import ma.youcode.lineperm.service.UserService;
+import ma.youcode.lineperm.access.ControleAcces;
 
 public class ConsoleApp {
 
@@ -60,21 +61,21 @@ public class ConsoleApp {
         System.out.println("Nom du fichier : ");
         String name = scanner.nextLine();
 
-        File file = fileService.getFile(name);
+        FichierProtege file = fileService.getFile(name);
 
         if(file == null){
             System.out.println("Fichier introuvable");
             return;
         }
 
-        boolean canRead = fileService.canRead(file, currentUser.getLogin());
+        String content = fileService.readFile(name, currentUser.getLogin());
 
-        if(!canRead){
-            System.out.println("Acces refuse");
+        if(content == null){
+            System.out.println("Permission refusee");
             return;
         }
 
-        System.out.println(file.getContent());
+        System.out.println(content);
 
     }
 
@@ -87,9 +88,10 @@ public class ConsoleApp {
             return;
         }
 
-        File file = fileService.getFile(name);
+        FichierProtege file = fileService.getFile(name);
 
         System.out.print("");
+        
     }
 
     public void run() {

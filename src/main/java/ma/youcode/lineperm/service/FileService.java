@@ -77,7 +77,7 @@ public class FileService {
             return false;
         }
 
-        Path dataDir = Path.of("src/main/java/ma/youcode/lineperm/data");
+        Path dataDir = Path.of("data");
         Path filePath = dataDir.resolve(fileName);
 
         try{
@@ -88,6 +88,29 @@ public class FileService {
             return false;
         }
 
+    }
+
+    public String readFile(String fileName, String login){
+
+        FichierProtege fichier = getFile(fileName);
+
+        if(fichier == null){
+            return null;
+        }
+
+        if(!ControleAcces.estAutorise(login, fichier, 'r')){
+            return null;
+        }
+
+        Path dataDir = Path.of("data");
+        Path filePath = dataDir.resolve(fileName);
+
+        try{
+            return Files.readString(filePath);
+        }
+        catch(IOException e){
+            return null;
+        }
     }
     
 }
