@@ -74,5 +74,20 @@ public class FichierProtege{
         this.othersCanDelete = othersCanDelete;
     }
 
+    public String getPermissionsDisplay(){
+
+        String ownerPermission = 
+            (ownerCanRead ? "r" : "-") + 
+            (ownerCanWrite ? "w" : "-") +
+            (ownerCanDelete ? "d" : "-");
+
+        String othersPermission = 
+            (othersCanRead ? "r" : "-") + 
+            (othersCanWrite ? "w" : "-") +
+            (othersCanDelete ? "d" : "-"); 
+
+        return ownerPermission + "|" + othersPermission;
+    }
+
     
 }
