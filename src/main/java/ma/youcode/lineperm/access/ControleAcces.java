@@ -1,11 +1,10 @@
 package ma.youcode.lineperm.access;
 
 import ma.youcode.lineperm.model.FichierProtege;
-import ma.youcode.lineperm.service.FileService;
+
 
 public class ControleAcces {
 
-    // FileService fileService = new FileService();
     
     public static boolean estAutorise(String login, FichierProtege fichier, char droit){
 

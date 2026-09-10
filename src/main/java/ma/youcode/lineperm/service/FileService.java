@@ -1,6 +1,5 @@
 package ma.youcode.lineperm.service;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ma.youcode.lineperm.model.FichierProtege;
+import ma.youcode.lineperm.access.ControleAcces;
 
 public class FileService {
 
@@ -29,6 +29,7 @@ public class FileService {
         }
         return true;
     }
+
     
 
     public boolean createFile(String name, String owner){
@@ -64,40 +65,6 @@ public class FileService {
         return files.values();
     }
 
-    public boolean canRead(FichierProtege file, String login){
-
-        String owner = file.getOwner();
-        // String otherPermissions = file.getOthersPermissions();
-
-        if(login.equals(owner)){
-            return true;
-        }
-
-        if(file.getOthersCanRead()){
-            return true;
-        }
-        
-        return false;
-    }
-
-    public boolean canWrite(FichierProtege fichier, String login){
-
-        String fileOwner = fichier.getOwner();
-
-        // String otherPermissions = file.getOthersPermissions();
-
-        
-        if(login.equals(fileOwner)){
-            return true;
-        }
-
-        if(fichier.getOthersCanWrite()){
-            return true;
-        }
-
-        return false;
-    }
-
     public boolean writeFile(String fileName, String login, String newContent){
 
         FichierProtege fichier = getFile(fileName);
@@ -106,15 +73,20 @@ public class FileService {
             return false;
         }
 
-        boolean canWrite = canWrite(fichier, login);
-
-        if(!canWrite){
+        if(!ControleAcces.estAutorise(login, fichier, 'w')){
             return false;
         }
 
-        fichier.setContent(newContent);
+        Path dataDir = Path.of("src/main/java/ma/youcode/lineperm/data");
+        Path filePath = dataDir.resolve(fileName);
 
-        return true;
+        try{
+            Files.writeString(filePath, newContent);
+            return true;
+        }
+        catch(IOException e){
+            return false;
+        }
 
     }
     
