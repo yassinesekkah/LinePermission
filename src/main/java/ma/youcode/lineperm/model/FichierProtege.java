@@ -58,7 +58,7 @@ public class FichierProtege{
         return othersCanWrite;
     }
 
-    public boolean getOtherCanDelete(){
+    public boolean getOthersCanDelete(){
         return othersCanDelete;
     }
 
