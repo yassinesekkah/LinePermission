@@ -1,6 +1,6 @@
 package ma.youcode.lineperm.ui;
 
-import ma.youcode.lineperm.model.File;
+import ma.youcode.lineperm.model.FichierProtege;
 import java.util.Scanner;
 
 import ma.youcode.lineperm.model.User;
@@ -43,14 +43,13 @@ public class ConsoleApp {
 
         System.out.println("===> Tous les fichiers <===");
 
-        for(File file : fileService.getAllFiles()){
+        for(FichierProtege file : fileService.getAllFiles()){
 
-                String ownerPermissions = file.getOwnerPermissions();
-                String otherPermissions = file.getOthersPermissions();
+                String permissions = file.getPermissionsDisplay();
                 String fileName = file.getName();
+                String ownerName = file.getOwner();
 
-
-                System.out.println(ownerPermissions + "|" + otherPermissions + " " + fileName);
+                System.out.println( permissions + " " + ownerName + " owner: " + fileName);
         }
 
         System.out.println("==========================");
