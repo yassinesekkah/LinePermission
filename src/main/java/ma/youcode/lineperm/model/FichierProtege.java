@@ -17,17 +17,21 @@ public class FichierProtege{
 
     public FichierProtege(String name, String owner){
 
+        this(name, owner, true, true, true, false, false, false);
+
+    }
+
+    public FichierProtege(String name, String owner, boolean ownerCanRead, boolean ownerCanWrite, boolean ownerCanDelete
+                            ,boolean othersCanRead, boolean othersCanWrite, boolean otherCanDelete
+    ){
         this.name = name;
         this.owner = owner;
-
-        ownerCanRead = true;
-        ownerCanWrite = true;
-        ownerCanDelete = true;
-
-        othersCanRead = false;
-        othersCanWrite = false;
-        othersCanDelete = false;
-
+        this.ownerCanRead = ownerCanRead;
+        this.ownerCanWrite = ownerCanWrite;
+        this.ownerCanDelete = ownerCanDelete;
+        this.othersCanRead = othersCanRead;
+        this.othersCanWrite = othersCanWrite;
+        this.othersCanDelete = otherCanDelete;
     }
 
     public String getName(){
