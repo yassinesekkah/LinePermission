@@ -127,5 +127,76 @@ public class FileService {
 
         return true;
     }
+
+    public boolean changePermission(String fileName, String login, String permission){
+
+        FichierProtege fichier = getFile(fileName);
+
+        if(fichier == null){
+            return false;
+        }
+
+        if(!fichier.getOwner().equals(login)){
+
+            return false;
+        }
+
+        if(!permission.equals("r") &&
+            !permission.equals("w") &&
+            !permission.equals("d") &&
+            !permission.equals("-r") &&
+            !permission.equals("-w") &&
+            !permission.equals("-d")
+        ){
+            return false;
+        }
+
+        boolean remove = permission.startsWith("-");
+        char permi;
+
+        if(remove){
+            permi = permission.charAt(1);
+        }
+        else{
+            permi = permission.charAt(0);
+        }
+
+        switch (permi) {
+            case 'r':
+                if(!remove && fichier.getOthersCanRead()){
+                    return false;
+                }
+                if(remove && !fichier.getOthersCanRead()){
+                    return false;
+                }
+                fichier.setOtherCanRead(!remove);
+                break;
+
+            case 'w':
+                if(!remove && fichier.getOthersCanWrite()){
+                    return false;
+                }
+                if(remove && !fichier.getOthersCanWrite()){
+                    return false;
+                }
+                fichier.setOthersCanWrite(!remove);
+                break;
+            
+            case 'd':
+                if(!remove && fichier.getOthersCanDelete()){
+                    return false;
+                }
+                if(remove && !fichier.getOthersCanDelete()){
+                    return false;
+                }
+                fichier.setOthersCanDelete(!remove);
+                break;
+        
+            default:
+                break;
+        }
+
+        return true;
+    }
     
 }

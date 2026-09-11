@@ -2,11 +2,10 @@ package ma.youcode.lineperm.ui;
 
 import ma.youcode.lineperm.model.FichierProtege;
 import java.util.Scanner;
-
 import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.service.FileService;
 import ma.youcode.lineperm.service.UserService;
-import ma.youcode.lineperm.access.ControleAcces;
+
 
 public class ConsoleApp {
 
@@ -119,6 +118,29 @@ public class ConsoleApp {
         }
     }
 
+    private void chmod(String[] parts){
+
+        if(!isConnected()){
+            return;
+        }
+
+        if(parts.length != 3){
+            System.out.println("command invalid");
+            return;
+        }
+
+        String permission = parts[1];
+        String fileName = parts[2];
+
+        boolean changed = fileService.changePermission(fileName, currentUser.getLogin(), permission);
+
+        if(changed){
+            System.out.println("Permission modifiee");
+        }else{
+            System.out.println("Aucune modification");
+        }
+    }
+
     public void run() {
 
         System.out.println("Bienvenue dans LinePermission");
@@ -132,7 +154,15 @@ public class ConsoleApp {
                 System.out.print(currentUser.getLogin() + "@linperm>");
             }
 
-            String command = scanner.nextLine().trim().toLowerCase();
+            // String command = scanner.nextLine().trim().toLowerCase();
+
+            String commandLine = scanner.nextLine().trim();
+
+            if(commandLine.isEmpty()){
+                continue;
+            }
+            String[] parts = commandLine.split("\\s+");
+            String command = parts[0];
 
             switch (command) {
 
@@ -246,6 +276,10 @@ public class ConsoleApp {
 
                     nano();
                     break;
+
+                case "chmod":
+                    
+                    chmod(parts);
 
                 default:
                     if (!command.isEmpty()) {
