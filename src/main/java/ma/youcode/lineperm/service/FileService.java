@@ -1,17 +1,21 @@
 package ma.youcode.lineperm.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ma.youcode.lineperm.model.FichierProtege;
 import ma.youcode.lineperm.access.ControleAcces;
 
 public class FileService {
+
+    public FileService(){
+        loadFiles();
+    }
 
     private Map<String, FichierProtege> files = new HashMap<>();
     private final Path metadataPath = Path.of("data", "files.txt");
@@ -225,5 +229,49 @@ public class FileService {
         }
     }
 
-    public 
+    private void loadFiles(){
+        if(!Files.exists(metadataPath)){
+            return;
+        }
+        List<String> lines;
+        try{
+            lines = Files.readAllLines(metadataPath);
+        }
+        catch(IOException e){
+            return;
+        }
+
+        for(String line : lines){
+            String[] parts = line.split(";");
+
+            if(parts.length != 3){
+                continue;
+            }
+
+            String fileName = parts[0];
+            String owner = parts[1];
+            String[] permission = parts[2].split("\\|");
+
+            if(permission.length != 2){
+                continue;
+            }
+
+            String ownerPermission = permission[0];
+            String otherPermission = permission[1];
+
+            boolean ownerCanRead = ownerPermission.charAt(0) == 'r';
+            boolean ownerCanWrite = ownerPermission.charAt(1) == 'w';
+            boolean ownerCanDelete = ownerPermission.charAt(2) == 'd';
+
+            boolean othersCanRead = otherPermission.charAt(0) == 'r';
+            boolean othersCanWrite = otherPermission.charAt(1) == 'w';
+            boolean othersCanDelete = otherPermission.charAt(2) == 'd';
+
+            FichierProtege fichier = new FichierProtege(fileName, owner, ownerCanRead, ownerCanWrite, ownerCanDelete,
+                                                            othersCanRead, othersCanWrite, othersCanDelete
+            );
+
+            files.put(fileName, fichier);
+        }
+    }
 }

@@ -280,6 +280,7 @@ public class ConsoleApp {
                 case "chmod":
                     
                     chmod(parts);
+                    break;
 
                 default:
                     if (!command.isEmpty()) {
