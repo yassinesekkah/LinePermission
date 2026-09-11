@@ -1,5 +1,6 @@
 package ma.youcode.lineperm.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +14,7 @@ import ma.youcode.lineperm.access.ControleAcces;
 public class FileService {
 
     private Map<String, FichierProtege> files = new HashMap<>();
+    private final Path metadataPath = Path.of("data", "files.txt");
 
     public boolean fileExists(String name){
         return files.containsKey(name);
@@ -29,8 +31,6 @@ public class FileService {
         }
         return true;
     }
-
-    
 
     public boolean createFile(String name, String owner){
 
@@ -51,6 +51,8 @@ public class FileService {
 
             FichierProtege fichier = new FichierProtege(name, owner);
             files.put(name, fichier);
+
+            saveFiles();
 
             return true;
 
@@ -195,8 +197,31 @@ public class FileService {
             default:
                 break;
         }
+        saveFiles();
 
         return true;
     }
     
+    private void saveFiles(){
+
+        StringBuilder data = new StringBuilder();
+
+        for(FichierProtege fichier : files.values()){
+
+            data.append(fichier.getName())
+                .append(";")
+                .append(fichier.getOwner())
+                .append(";")
+                .append(fichier.getPermissionsDisplay())
+                .append("\n");
+        }
+
+        try{
+            Files.createDirectories(Path.of("data"));
+            Files.writeString(metadataPath, data.toString());
+        }
+        catch(IOException e){
+
+        }
+    }
 }
