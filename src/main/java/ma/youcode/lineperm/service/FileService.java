@@ -112,5 +112,20 @@ public class FileService {
             return null;
         }
     }
+
+    public boolean canWriteFile(String fileName, String login){
+
+        FichierProtege fichier = getFile(fileName);
+
+        if(fichier == null){
+            return false;
+        }
+
+        if(!ControleAcces.estAutorise(login, fichier, 'w')){
+            return false;
+        }
+
+        return true;
+    }
     
 }

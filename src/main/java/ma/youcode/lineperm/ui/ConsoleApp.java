@@ -32,45 +32,46 @@ public class ConsoleApp {
         return !login.isEmpty() && !login.contains(" ") && !login.contains(":");
     }
 
-    private boolean isConnected(){
-        if(currentUser == null){
+    private boolean isConnected() {
+        if (currentUser == null) {
             System.out.println("Vous devez etre connecte");
             return false;
-        };
+        }
+        ;
         return true;
     }
 
-    private void listFiles(){
+    private void listFiles() {
 
         System.out.println("===> Tous les fichiers <===");
 
-        for(FichierProtege file : fileService.getAllFiles()){
+        for (FichierProtege file : fileService.getAllFiles()) {
 
-                String permissions = file.getPermissionsDisplay();
-                String fileName = file.getName();
-                String ownerName = file.getOwner();
+            String permissions = file.getPermissionsDisplay();
+            String fileName = file.getName();
+            String ownerName = file.getOwner();
 
-                System.out.println( permissions + " " + ownerName + " owner: " + fileName);
+            System.out.println(permissions + " owner : " + ownerName + " fichier: " + fileName);
         }
 
         System.out.println("==========================");
     }
 
-    private void cat(){
+    private void cat() {
 
         System.out.println("Nom du fichier : ");
         String name = scanner.nextLine();
 
         FichierProtege file = fileService.getFile(name);
 
-        if(file == null){
+        if (file == null) {
             System.out.println("Fichier introuvable");
             return;
         }
 
         String content = fileService.readFile(name, currentUser.getLogin());
 
-        if(content == null){
+        if (content == null) {
             System.out.println("Permission refusee");
             return;
         }
@@ -79,19 +80,43 @@ public class ConsoleApp {
 
     }
 
-    private void nano(){
+    private void nano() {
         System.out.print("Le nom de fichier: ");
         String name = scanner.nextLine();
 
-        if(!fileService.fileExists(name)){
+        if (!fileService.fileExists(name)) {
             System.out.println("fichier introuvable");
             return;
         }
 
-        FichierProtege file = fileService.getFile(name);
+        boolean canWrite = fileService.canWriteFile(name, currentUser.getLogin());
 
-        System.out.print("");
-        
+        if (!canWrite) {
+            System.out.println("Permission denied.");
+            return;
+        }
+
+        StringBuilder content = new StringBuilder();
+
+        System.out.println("Entrez le contenu. Tapez EOF pour terminer:");
+
+        while (true) {
+            String line = scanner.nextLine();
+
+            if(line.equals("EOF")){
+                break;
+            }
+            content.append(line).append("\n");
+        }
+
+        boolean written = fileService.writeFile(name, currentUser.getLogin(), content.toString());
+
+        if(written){
+            System.out.println("Fichier modifie");
+        }
+        else{
+            System.out.println("Erreur pendant l'ecriture");
+        }
     }
 
     public void run() {
@@ -178,45 +203,44 @@ public class ConsoleApp {
                     break;
 
                 case "exit":
-                
+
                     System.out.println("Au revoir!");
                     return;
 
                 case "touch":
 
-                    if(!isConnected()){
+                    if (!isConnected()) {
                         break;
                     }
 
-                    System.out.print("Le nom de fichier : " );
+                    System.out.print("Le nom de fichier : ");
                     String fileName = scanner.nextLine().trim();
 
                     boolean createdFile = fileService.createFile(fileName, currentUser.getLogin());
 
-                    if(createdFile){
+                    if (createdFile) {
                         System.out.println("Fichier cree");
-                    }
-                    else{
+                    } else {
                         System.out.println("Ce nom de fichier est deja utilise");
                     }
                     break;
 
                 case "ls":
-                    if(!isConnected()){
+                    if (!isConnected()) {
                         break;
                     }
                     listFiles();
                     break;
 
                 case "cat":
-                    if(!isConnected()){
+                    if (!isConnected()) {
                         break;
                     }
                     cat();
                     break;
 
                 case "nano":
-                    if(!isConnected()){
+                    if (!isConnected()) {
                         break;
                     }
 
