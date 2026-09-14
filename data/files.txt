@@ -1,1 +1,1 @@
-gg.txt;yassine;rwd|rw-
+gg.txt;yassine;rwd|-w-
