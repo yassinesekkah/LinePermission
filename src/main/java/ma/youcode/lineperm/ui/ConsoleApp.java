@@ -141,6 +141,30 @@ public class ConsoleApp {
         }
     }
 
+    private void rm(String[] parts){
+
+         if(!isConnected()){
+            return;
+        }
+
+        if(parts.length != 2){
+            System.out.println("command invalid");
+            return;
+        }
+
+        String fichier = parts[1];
+
+        boolean deleted = fileService.deleteFile(fichier, currentUser.getLogin());
+
+        if(deleted){
+            System.out.println("le fichier est supprime");
+        }
+        else{
+            System.out.println("Aucune modification");
+        }
+
+
+    }
     public void run() {
 
         System.out.println("Bienvenue dans LinePermission");
@@ -280,6 +304,10 @@ public class ConsoleApp {
                 case "chmod":
                     
                     chmod(parts);
+                    break;
+
+                case "rm":
+                    rm(parts);
                     break;
 
                 default:
