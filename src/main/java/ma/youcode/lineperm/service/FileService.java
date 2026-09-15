@@ -15,9 +15,10 @@ import ma.youcode.lineperm.access.ControleAcces;
 
 public class FileService {
 
-    private final LogService logService = new LogService();
+    private final LogService logService;
 
-    public FileService() {
+    public FileService(LogService logService) {
+        this.logService = logService;
         loadFiles();
     }
 

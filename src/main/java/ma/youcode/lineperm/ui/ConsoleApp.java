@@ -4,6 +4,8 @@ import ma.youcode.lineperm.model.FichierProtege;
 import java.util.Scanner;
 import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.service.FileService;
+import ma.youcode.lineperm.service.LogAnalyzer;
+import ma.youcode.lineperm.service.LogService;
 import ma.youcode.lineperm.service.UserService;
 
 
@@ -12,7 +14,11 @@ public class ConsoleApp {
     private final Scanner scanner = new Scanner(System.in);
     private final UserService userService = new UserService();
     private User currentUser = null;
-    private final FileService fileService = new FileService();
+    private final LogService logService = new LogService();
+    private final FileService fileService = new FileService(logService);
+
+    
+    private final LogAnalyzer logAnalyzer = new LogAnalyzer(logService.getLogs());
 
     private void logout() {
 

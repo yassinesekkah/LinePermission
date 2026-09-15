@@ -7,6 +7,8 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import ma.youcode.lineperm.model.AccessLog;
@@ -14,6 +16,16 @@ import ma.youcode.lineperm.model.ActionTypes;
 import ma.youcode.lineperm.model.Status;
 
 public class LogService {
+
+    private List<AccessLog> logs = new ArrayList<>();
+
+    public LogService(){
+        loadLogs();
+    }
+
+    public List<AccessLog> getLogs(){
+        return logs;
+    }
 
     public String buildLogLine(String user, String fichier, ActionTypes action, Status status) {
 
@@ -104,6 +116,29 @@ public class LogService {
             return Optional.empty();
         }
 
+    }
+
+    public List<AccessLog> loadLogs(){
+
+        try{
+            Path accessPath = Path.of("access.log");
+            List<String> lines = Files.readAllLines(accessPath);
+
+            List<AccessLog> loadedLogs = lines.stream()
+                .map(line -> parseLine(line))
+                .filter(optional -> optional.isPresent())
+                .map(optional -> optional.get())
+                .toList();
+
+            logs = loadedLogs;
+
+            return logs;
+            
+        }
+        catch(IOException e){
+            logs = new ArrayList<>();
+            return logs;
+        }
     }
 
 }
