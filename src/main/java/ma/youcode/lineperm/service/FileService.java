@@ -141,10 +141,10 @@ public class FileService {
             String content = Files.readString(filePath);
             // log
             logService.logAction(
-                login, 
-                fileName,
-                ActionTypes.LECTURE, 
-                Status.OK);
+                    login,
+                    fileName,
+                    ActionTypes.LECTURE,
+                    Status.OK);
 
             return content;
 
@@ -301,6 +301,49 @@ public class FileService {
                     othersCanRead, othersCanWrite, othersCanDelete);
 
             files.put(fileName, fichier);
+        }
+    }
+
+    public boolean deleteFile(String fileName, String login) {
+
+        FichierProtege fichier = getFile(fileName);
+
+        if (fichier == null) {
+            return false;
+        }
+
+        if (!ControleAcces.estAutorise(login, fichier, 'd')) {
+
+            // log
+            logService.logAction(
+                    login,
+                    fileName,
+                    ActionTypes.SUPPRESSION,
+                    Status.REFUSE);
+
+            return false;
+        }
+
+        Path dataDir = Path.of("data");
+        Path filePath = dataDir.resolve(fileName);
+
+        try {
+            Files.delete(filePath);
+
+            files.remove(fileName);
+            saveFiles();
+
+            // log
+            logService.logAction(
+                    login,
+                    fileName,
+                    ActionTypes.SUPPRESSION,
+                    Status.OK);
+
+            return true;
+
+        } catch (IOException e) {
+            return false;
         }
     }
 }
