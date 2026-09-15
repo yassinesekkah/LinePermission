@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import ma.youcode.lineperm.model.ActionTypes;
 import ma.youcode.lineperm.model.Status;
@@ -15,7 +16,8 @@ public class LogService {
     public String buildLogLine(String user, String fichier, ActionTypes action, Status status) {
 
         LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String time = LocalTime.now().format(formatter);
 
         StringBuilder line = new StringBuilder();
 
