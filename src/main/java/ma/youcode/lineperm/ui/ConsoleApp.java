@@ -4,6 +4,8 @@ import ma.youcode.lineperm.model.FichierProtege;
 import java.util.Scanner;
 import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.service.FileService;
+import ma.youcode.lineperm.service.LogAnalyzer;
+import ma.youcode.lineperm.service.LogService;
 import ma.youcode.lineperm.service.UserService;
 
 
@@ -12,7 +14,11 @@ public class ConsoleApp {
     private final Scanner scanner = new Scanner(System.in);
     private final UserService userService = new UserService();
     private User currentUser = null;
-    private final FileService fileService = new FileService();
+    private final LogService logService = new LogService();
+    private final FileService fileService = new FileService(logService);
+
+    
+    private final LogAnalyzer logAnalyzer = new LogAnalyzer(logService.getLogs());
 
     private void logout() {
 
@@ -141,6 +147,30 @@ public class ConsoleApp {
         }
     }
 
+    private void rm(String[] parts){
+
+         if(!isConnected()){
+            return;
+        }
+
+        if(parts.length != 2){
+            System.out.println("command invalid");
+            return;
+        }
+
+        String fichier = parts[1];
+
+        boolean deleted = fileService.deleteFile(fichier, currentUser.getLogin());
+
+        if(deleted){
+            System.out.println("le fichier est supprime");
+        }
+        else{
+            System.out.println("Aucune modification");
+        }
+
+
+    }
     public void run() {
 
         System.out.println("Bienvenue dans LinePermission");
@@ -280,6 +310,10 @@ public class ConsoleApp {
                 case "chmod":
                     
                     chmod(parts);
+                    break;
+
+                case "rm":
+                    rm(parts);
                     break;
 
                 default:
