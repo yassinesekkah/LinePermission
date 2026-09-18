@@ -1,13 +1,15 @@
 package ma.youcode.lineperm.ui;
 
+import ma.youcode.lineperm.model.AccessLog;
 import ma.youcode.lineperm.model.FichierProtege;
+
+import java.util.List;
 import java.util.Scanner;
 import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.service.FileService;
 import ma.youcode.lineperm.service.LogAnalyzer;
 import ma.youcode.lineperm.service.LogService;
 import ma.youcode.lineperm.service.UserService;
-
 
 public class ConsoleApp {
 
@@ -17,7 +19,6 @@ public class ConsoleApp {
     private final LogService logService = new LogService();
     private final FileService fileService = new FileService(logService);
 
-    
     private final LogAnalyzer logAnalyzer = new LogAnalyzer(logService.getLogs());
 
     private void logout() {
@@ -108,7 +109,7 @@ public class ConsoleApp {
         while (true) {
             String line = scanner.nextLine();
 
-            if(line.equals("EOF")){
+            if (line.equals("EOF")) {
                 break;
             }
             content.append(line).append("\n");
@@ -116,21 +117,20 @@ public class ConsoleApp {
 
         boolean written = fileService.writeFile(name, currentUser.getLogin(), content.toString());
 
-        if(written){
+        if (written) {
             System.out.println("Fichier modifie");
-        }
-        else{
+        } else {
             System.out.println("Erreur pendant l'ecriture");
         }
     }
 
-    private void chmod(String[] parts){
+    private void chmod(String[] parts) {
 
-        if(!isConnected()){
+        if (!isConnected()) {
             return;
         }
 
-        if(parts.length != 3){
+        if (parts.length != 3) {
             System.out.println("command invalid");
             return;
         }
@@ -140,20 +140,20 @@ public class ConsoleApp {
 
         boolean changed = fileService.changePermission(fileName, currentUser.getLogin(), permission);
 
-        if(changed){
+        if (changed) {
             System.out.println("Permission modifiee");
-        }else{
+        } else {
             System.out.println("Aucune modification");
         }
     }
 
-    private void rm(String[] parts){
+    private void rm(String[] parts) {
 
-         if(!isConnected()){
+        if (!isConnected()) {
             return;
         }
 
-        if(parts.length != 2){
+        if (parts.length != 2) {
             System.out.println("command invalid");
             return;
         }
@@ -162,15 +162,96 @@ public class ConsoleApp {
 
         boolean deleted = fileService.deleteFile(fichier, currentUser.getLogin());
 
-        if(deleted){
+        if (deleted) {
             System.out.println("le fichier est supprime");
-        }
-        else{
+        } else {
             System.out.println("Aucune modification");
         }
 
-
     }
+
+    private void showRefusedAccessByUser() {
+
+        System.out.print("Nom utilisateur : ");
+        String name = scanner.nextLine();
+
+        List<AccessLog> refusedLogs = logAnalyzer.getRefusedAccessByUser(name);
+
+        if (refusedLogs.isEmpty()) {
+            System.out.println("Aucun accès refusé.");
+            return;
+        }
+
+        for (AccessLog log : refusedLogs) {
+            System.out.println(
+                    log.getDate() + ";" +
+                            log.getTime() + ";" +
+                            log.getUser() + ";" +
+                            log.getAction() + ";" +
+                            log.getFichier() + ";" +
+                            log.getState());
+        }
+    }
+
+    private void showStats() {
+
+        System.out.println("=== Statistiques ===");
+        System.out.println("1. Total actions");
+        System.out.println("2. Accès refusés");
+        System.out.println("3. Utilisateurs distincts");
+        System.out.println("4. Actions par utilisateur");
+        System.out.println("5. Top 3 fichiers consultés");
+        System.out.println("6. Accès refusés d'un utilisateur");
+        System.out.println("7. Utilisateur le plus actif");
+        System.out.println("8. Actions par type");
+        System.out.println("0. Retour");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                System.out.println(logAnalyzer.countTotalActions());
+                break;
+
+            case 2:
+                System.out.println(logAnalyzer.countRefusedAccess());
+                break;
+
+            case 3:
+                System.out.println(logAnalyzer.countDistinctUsers());
+                break;
+
+            case 4:
+                System.out.println(logAnalyzer.countActionsByUser());
+                break;
+
+            case 5:
+                System.out.println(logAnalyzer.getTop3ConsultedFiles());
+                break;
+
+            case 6:
+                showRefusedAccessByUser();
+                break;
+
+            case 7:
+                System.out.println(
+                        logAnalyzer.getMostActiveUser()
+                                .orElse("Aucun utilisateur"));
+                break;
+
+            case 8:
+                System.out.println(logAnalyzer.countActionByType());
+                break;
+
+            case 0:
+                return;
+
+            default:
+                System.out.println("Choix invalide");
+        }
+    }
+
     public void run() {
 
         System.out.println("Bienvenue dans LinePermission");
@@ -188,7 +269,7 @@ public class ConsoleApp {
 
             String commandLine = scanner.nextLine().trim();
 
-            if(commandLine.isEmpty()){
+            if (commandLine.isEmpty()) {
                 continue;
             }
             String[] parts = commandLine.split("\\s+");
@@ -308,12 +389,16 @@ public class ConsoleApp {
                     break;
 
                 case "chmod":
-                    
+
                     chmod(parts);
                     break;
 
                 case "rm":
                     rm(parts);
+                    break;
+
+                case "stats":
+                    showStats();
                     break;
 
                 default:

@@ -9,6 +9,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import ma.youcode.lineperm.model.AccessLog;
+import ma.youcode.lineperm.model.ActionTypes;
 import ma.youcode.lineperm.model.Status;
 
 public class LogAnalyzer {
@@ -86,6 +87,15 @@ public class LogAnalyzer {
                     .max(Map.Entry.comparingByValue())
                     .map(entry -> entry.getKey());
 
+    }
+
+    public Map<ActionTypes, Long> countActionByType(){
+
+        return logs.stream()
+                .collect(Collectors.groupingBy(
+                    log -> log.getAction(),
+                    Collectors.counting()
+                ));
     }
 
 }
