@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -46,26 +47,45 @@ public class LogAnalyzer {
                         Collectors.counting()));
     }
 
-    public Map<String, Long> getTop3ConsultedFiles(){
+    public Map<String, Long> getTop3ConsultedFiles() {
 
         Comparator<Map.Entry<String, Long>> comparator = Map.Entry.comparingByValue();
 
         return logs.stream()
                 .collect(Collectors.groupingBy(
-                    log -> log.getFichier(),
-                    Collectors.counting()
-                ))
+                        log -> log.getFichier(),
+                        Collectors.counting()))
                 .entrySet()
                 .stream()
                 .sorted(comparator.reversed())
                 .limit(3)
                 .collect(Collectors.toMap(
-                    entry -> entry.getKey(), 
-                    entry -> entry.getValue(),
-                    (e1, e2) -> e1,
-                    LinkedHashMap::new
-                ));
-                
+                        entry -> entry.getKey(),
+                        entry -> entry.getValue(),
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new));
+
+    }
+
+    public List<AccessLog> getRefusedAccessByUser(String name) {
+
+        return logs.stream()
+                .filter(log -> log.getUser().equals(name))
+                .filter(log -> log.getState() == Status.REFUSE)
+                .toList();
+    }
+
+    public Optional<String> getMostActiveUser() {
+
+        Map<String, Long> first = logs.stream()
+                .collect(Collectors.groupingBy(
+                        log -> log.getUser(),
+                        Collectors.counting()));
+
+        return first.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(entry -> entry.getKey());
+
     }
 
 }

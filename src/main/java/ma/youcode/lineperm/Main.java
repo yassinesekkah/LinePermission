@@ -17,14 +17,14 @@ public class Main {
 
         // userService.loadUsers();
 
-        LogService logService = new LogService();
+        // LogService logService = new LogService();
 
         // Optional<AccessLog> result = logService.parseLine("2026-09-14;yassine;LECTURE;gg.txt;OK");
 
         // System.out.println(result.isPresent());
 
-        logService.loadLogs();
-        System.out.println("Nombre de logs : " + logService.getLogs().size());
+        // logService.loadLogs();
+        // System.out.println("Nombre de logs : " + logService.getLogs().size());
         
        
     }
