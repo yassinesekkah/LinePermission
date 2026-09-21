@@ -9,17 +9,17 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // ConsoleApp app = new ConsoleApp();
-        // app.run();
+        ConsoleApp app = new ConsoleApp();
+        app.run();
 
-        Connection connection = DBConnection.getInstance().getConnection();
+        // Connection connection = DBConnection.getInstance().getConnection();
 
-        if(connection != null){
-            System.out.println("Connexion SQLite réussie");
-        }
-        else{
-            System.out.println("Connexion échouée");
-        }
+        // if(connection != null){
+        //     System.out.println("Connexion SQLite réussie");
+        // }
+        // else{
+        //     System.out.println("Connexion échouée");
+        // }
 
 
         

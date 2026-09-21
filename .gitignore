@@ -1,0 +1,15 @@
+# Compiled files
+target/
+*.class
+
+# Local database
+auditdb.db
+data/auditdb.db
+
+# IDE
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
