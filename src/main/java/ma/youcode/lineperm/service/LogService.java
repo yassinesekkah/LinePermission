@@ -132,6 +132,7 @@ public class LogService {
 
             logs = loadedLogs;
 
+            
             return logs;
             
         }
