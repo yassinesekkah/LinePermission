@@ -19,6 +19,7 @@ public class DBConnection {
 
             createUsersTable();
             createFichiersTable();
+            createLogsTable();
 
         } catch (SQLException e) {
             System.out.println("Erreur de connexion à la base de données");
@@ -48,7 +49,7 @@ public class DBConnection {
                         """;
 
         try (Statement statement = connection.createStatement()) {
-            
+
             statement.execute(sql);
             System.out.println("Table users créée");
 
@@ -69,14 +70,49 @@ public class DBConnection {
                 );
                         """;
 
-        try (Statement statement = connection.createStatement()){
-    
+        try (Statement statement = connection.createStatement()) {
+
             statement.execute(sql);
             System.out.println("Table fichiers cree.");
 
         } catch (SQLException e) {
             System.out.println("Erreur sur creation table fichiers.");
         }
+    }
 
+    private void createLogsTable() {
+
+        String sql = """
+                        CREATE TABLE IF NOT EXISTS logs(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    fichier_id INTEGER NOT NULL,
+                    action TEXT NOT NULL,
+                    resultat TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(user_id) REFERENCES users(id),
+                    FOREIGN KEY(fichier_id) REFERENCES fichiers(id)
+                );
+                        """;
+
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+            System.out.println("table logs cree");
+
+        } catch (SQLException e) {
+            System.out.println("Erreur creation table logs");
+        }
+    }
+
+    private void enableForeignKeys(){
+
+        String sql = "PRAGMA foreign_keys = ON;";
+
+        try(Statement statement = connection.createStatement()){
+            statement.execute(sql);
+            
+        }catch(SQLException e){
+            System.out.println("Erreur activation des clés étrangères");
+        }
     }
 }
