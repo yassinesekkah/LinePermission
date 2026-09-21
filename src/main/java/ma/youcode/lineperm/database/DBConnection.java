@@ -17,6 +17,8 @@ public class DBConnection {
         try {
             connection = DriverManager.getConnection(URL);
 
+            enableForeignKeys();
+
             createUsersTable();
             createFichiersTable();
             createLogsTable();
