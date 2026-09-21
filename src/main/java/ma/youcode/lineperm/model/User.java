@@ -2,6 +2,7 @@ package ma.youcode.lineperm.model;
 
 public class User {
     
+    private int id;
     private final String login;
     private final String passwordHash;
 
@@ -9,6 +10,16 @@ public class User {
 
         this.login = login;
         this.passwordHash = passwordHash;
+    }
+
+    public User(int id, String login, String passwordHash){
+        
+        this(login, passwordHash);
+        this.id = id;
+    }
+
+    public int getId(){
+        return id;
     }
 
     public String getLogin(){

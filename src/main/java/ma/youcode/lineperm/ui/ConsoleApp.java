@@ -1,7 +1,7 @@
 package ma.youcode.lineperm.ui;
 
-import ma.youcode.lineperm.model.AccessLog;
-import ma.youcode.lineperm.model.FichierProtege;
+import ma.youcode.lineperm.model.Log;
+import ma.youcode.lineperm.model.Fichier;
 
 import java.util.List;
 import java.util.Scanner;
@@ -51,11 +51,11 @@ public class ConsoleApp {
 
         System.out.println("===> Tous les fichiers <===");
 
-        for (FichierProtege file : fileService.getAllFiles()) {
+        for (Fichier file : fileService.getAllFiles()) {
 
             String permissions = file.getPermissionsDisplay();
             String fileName = file.getName();
-            String ownerName = file.getOwner();
+            String ownerName = file.getOwner().getLogin();
 
             System.out.println(permissions + " owner : " + ownerName + " fichier: " + fileName);
         }
@@ -68,7 +68,7 @@ public class ConsoleApp {
         System.out.println("Nom du fichier : ");
         String name = scanner.nextLine();
 
-        FichierProtege file = fileService.getFile(name);
+        Fichier file = fileService.getFile(name);
 
         if (file == null) {
             System.out.println("Fichier introuvable");
@@ -175,14 +175,14 @@ public class ConsoleApp {
         System.out.print("Nom utilisateur : ");
         String name = scanner.nextLine();
 
-        List<AccessLog> refusedLogs = logAnalyzer.getRefusedAccessByUser(name);
+        List<Log> refusedLogs = logAnalyzer.getRefusedAccessByUser(name);
 
         if (refusedLogs.isEmpty()) {
             System.out.println("Aucun accès refusé.");
             return;
         }
 
-        for (AccessLog log : refusedLogs) {
+        for (Log log : refusedLogs) {
             System.out.println(
                     log.getDate() + ";" +
                             log.getTime() + ";" +
@@ -357,7 +357,7 @@ public class ConsoleApp {
                     System.out.print("Le nom de fichier : ");
                     String fileName = scanner.nextLine().trim();
 
-                    boolean createdFile = fileService.createFile(fileName, currentUser.getLogin());
+                    boolean createdFile = fileService.createFile(fileName, currentUser);
 
                     if (createdFile) {
                         System.out.println("Fichier cree");
