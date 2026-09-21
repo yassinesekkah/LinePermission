@@ -1,6 +1,6 @@
 package ma.youcode.lineperm.ui;
 
-import ma.youcode.lineperm.model.AccessLog;
+import ma.youcode.lineperm.model.Log;
 import ma.youcode.lineperm.model.Fichier;
 
 import java.util.List;
@@ -175,14 +175,14 @@ public class ConsoleApp {
         System.out.print("Nom utilisateur : ");
         String name = scanner.nextLine();
 
-        List<AccessLog> refusedLogs = logAnalyzer.getRefusedAccessByUser(name);
+        List<Log> refusedLogs = logAnalyzer.getRefusedAccessByUser(name);
 
         if (refusedLogs.isEmpty()) {
             System.out.println("Aucun accès refusé.");
             return;
         }
 
-        for (AccessLog log : refusedLogs) {
+        for (Log log : refusedLogs) {
             System.out.println(
                     log.getDate() + ";" +
                             log.getTime() + ";" +

@@ -11,19 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import ma.youcode.lineperm.model.AccessLog;
+import ma.youcode.lineperm.model.Log;
 import ma.youcode.lineperm.model.ActionTypes;
 import ma.youcode.lineperm.model.Status;
 
 public class LogService {
 
-    private List<AccessLog> logs = new ArrayList<>();
+    private List<Log> logs = new ArrayList<>();
 
     public LogService(){
-        loadLogs();
+        // loadLogs();
     }
 
-    public List<AccessLog> getLogs(){
+    public List<Log> getLogs(){
         return logs;
     }
 
@@ -75,71 +75,71 @@ public class LogService {
         return writeLog(line);
     }
 
-    public Optional<AccessLog> parseLine(String line) {
+    // public Optional<Log> parseLine(String line) {
 
-        String[] parts = line.split(";");
+    //     String[] parts = line.split(";");
 
-        if (parts.length != 6) {
-            return Optional.empty();
-        }
+    //     if (parts.length != 6) {
+    //         return Optional.empty();
+    //     }
 
-        try {
+    //     try {
 
-            // date
-            String strDate = parts[0];
-            LocalDate date = LocalDate.parse(strDate);
+    //         // date
+    //         String strDate = parts[0];
+    //         LocalDate date = LocalDate.parse(strDate);
 
-            // time
-            String strTime = parts[1];
-            LocalTime time = LocalTime.parse(strTime);
+    //         // time
+    //         String strTime = parts[1];
+    //         LocalTime time = LocalTime.parse(strTime);
 
-            // user
-            String user = parts[2];
+    //         // user
+    //         String user = parts[2];
 
-            // actionType enum
-            String strAction = parts[3];
-            ActionTypes actionType = ActionTypes.valueOf(strAction);
+    //         // actionType enum
+    //         String strAction = parts[3];
+    //         ActionTypes actionType = ActionTypes.valueOf(strAction);
 
-            // fichier
-            String fichier = parts[4];
+    //         // fichier
+    //         String fichier = parts[4];
 
-            // status enum
-            String strState = parts[5];
-            Status state = Status.valueOf(strState);
+    //         // status enum
+    //         String strState = parts[5];
+    //         Status state = Status.valueOf(strState);
 
-            // cration d'objet
-            AccessLog accessLog = new AccessLog(date, time, user, actionType, fichier, state);
+    //         // cration d'objet
+    //         Log accessLog = new Log(date, time, user, actionType, fichier, state);
 
-            return Optional.of(accessLog);
+    //         return Optional.of(accessLog);
 
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+    //     } catch (Exception e) {
+    //         return Optional.empty();
+    //     }
 
-    }
+    // }
 
-    public List<AccessLog> loadLogs(){
+    // public List<Log> loadLogs(){
 
-        try{
-            Path accessPath = Path.of("access.log");
-            List<String> lines = Files.readAllLines(accessPath);
+    //     try{
+    //         Path accessPath = Path.of("access.log");
+    //         List<String> lines = Files.readAllLines(accessPath);
 
-            List<AccessLog> loadedLogs = lines.stream()
-                .map(line -> parseLine(line))
-                .filter(optional -> optional.isPresent())
-                .map(optional -> optional.get())
-                .toList();
+    //         List<Log> loadedLogs = lines.stream()
+    //             .map(line -> parseLine(line))
+    //             .filter(optional -> optional.isPresent())
+    //             .map(optional -> optional.get())
+    //             .toList();
 
-            logs = loadedLogs;
+    //         logs = loadedLogs;
 
-            return logs;
+    //         return logs;
             
-        }
-        catch(IOException e){
-            logs = new ArrayList<>();
-            return logs;
-        }
-    }
+    //     }
+    //     catch(IOException e){
+    //         logs = new ArrayList<>();
+    //         return logs;
+    //     }
+    // }
 
 
 }

@@ -8,15 +8,15 @@ import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import ma.youcode.lineperm.model.AccessLog;
+import ma.youcode.lineperm.model.Log;
 import ma.youcode.lineperm.model.ActionTypes;
 import ma.youcode.lineperm.model.Status;
 
 public class LogAnalyzer {
 
-    private List<AccessLog> logs;
+    private List<Log> logs;
 
-    public LogAnalyzer(List<AccessLog> logs) {
+    public LogAnalyzer(List<Log> logs) {
         this.logs = logs;
     }
 
@@ -35,7 +35,7 @@ public class LogAnalyzer {
     public long countDistinctUsers() {
 
         return logs.stream()
-                .map(log -> log.getUser())
+                .map(log -> log.getUser().getLogin())
                 .distinct()
                 .count();
     }
@@ -44,7 +44,7 @@ public class LogAnalyzer {
 
         return logs.stream()
                 .collect(Collectors.groupingBy(
-                        log -> log.getUser(),
+                        log -> log.getUser().getLogin(),
                         Collectors.counting()));
     }
 
@@ -54,7 +54,7 @@ public class LogAnalyzer {
 
         return logs.stream()
                 .collect(Collectors.groupingBy(
-                        log -> log.getFichier(),
+                        log -> log.getFichier().getName(),
                         Collectors.counting()))
                 .entrySet()
                 .stream()
@@ -68,10 +68,10 @@ public class LogAnalyzer {
 
     }
 
-    public List<AccessLog> getRefusedAccessByUser(String name) {
+    public List<Log> getRefusedAccessByUser(String name) {
 
         return logs.stream()
-                .filter(log -> log.getUser().equals(name))
+                .filter(log -> log.getUser().getLogin().equals(name))
                 .filter(log -> log.getState() == Status.REFUSE)
                 .toList();
     }
@@ -80,7 +80,7 @@ public class LogAnalyzer {
 
         Map<String, Long> first = logs.stream()
                 .collect(Collectors.groupingBy(
-                        log -> log.getUser(),
+                        log -> log.getUser().getLogin(),
                         Collectors.counting()));
 
         return first.entrySet().stream()
