@@ -1,12 +1,12 @@
 package ma.youcode.lineperm.access;
 
-import ma.youcode.lineperm.model.FichierProtege;
+import ma.youcode.lineperm.model.Fichier;
 
 
 public class ControleAcces {
 
     
-    public static boolean estAutorise(String login, FichierProtege fichier, char droit){
+    public static boolean estAutorise(String login, Fichier fichier, char droit){
 
         boolean isOwner = login.equals(fichier.getOwner());
 
@@ -19,7 +19,7 @@ public class ControleAcces {
                     return fichier.getOwnerCanWrite();
 
                 case 'd':
-                    return fichier.getOwenerCanDelete();
+                    return fichier.getOwnerCanDelete();
 
                 default:
                     return false;
