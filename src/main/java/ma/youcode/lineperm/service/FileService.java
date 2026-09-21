@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import ma.youcode.lineperm.model.ActionTypes;
-import ma.youcode.lineperm.model.FichierProtege;
+import ma.youcode.lineperm.model.Fichier;
 import ma.youcode.lineperm.model.Status;
+import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.access.ControleAcces;
 
 public class FileService {
@@ -19,17 +20,17 @@ public class FileService {
 
     public FileService(LogService logService) {
         this.logService = logService;
-        loadFiles();
+        // loadFiles();
     }
 
-    private Map<String, FichierProtege> files = new HashMap<>();
+    private Map<String, Fichier> files = new HashMap<>();
     private final Path metadataPath = Path.of("data", "files.txt");
 
     public boolean fileExists(String name) {
         return files.containsKey(name);
     }
 
-    public FichierProtege getFile(String name) {
+    public Fichier getFile(String name) {
 
         return files.get(name);
     }
@@ -41,7 +42,7 @@ public class FileService {
         return true;
     }
 
-    public boolean createFile(String name, String owner) {
+    public boolean createFile(String name, User owner) {
 
         if (fileExists(name)) {
             return false;
@@ -58,7 +59,7 @@ public class FileService {
             Files.createDirectories(dataDir);
             Files.createFile(filePath);
 
-            FichierProtege fichier = new FichierProtege(name, owner);
+            Fichier fichier = new Fichier(name, owner);
             files.put(name, fichier);
 
             saveFiles();
@@ -71,14 +72,14 @@ public class FileService {
 
     }
 
-    public Collection<FichierProtege> getAllFiles() {
+    public Collection<Fichier> getAllFiles() {
 
         return files.values();
     }
 
     public boolean writeFile(String fileName, String login, String newContent) {
 
-        FichierProtege fichier = getFile(fileName);
+        Fichier fichier = getFile(fileName);
 
         if (fichier == null) {
             return false;
@@ -118,7 +119,7 @@ public class FileService {
 
     public String readFile(String fileName, String login) {
 
-        FichierProtege fichier = getFile(fileName);
+        Fichier fichier = getFile(fileName);
 
         if (fichier == null) {
             return null;
@@ -156,7 +157,7 @@ public class FileService {
 
     public boolean canWriteFile(String fileName, String login) {
 
-        FichierProtege fichier = getFile(fileName);
+        Fichier fichier = getFile(fileName);
 
         if (fichier == null) {
             return false;
@@ -171,7 +172,7 @@ public class FileService {
 
     public boolean changePermission(String fileName, String login, String permission) {
 
-        FichierProtege fichier = getFile(fileName);
+        Fichier fichier = getFile(fileName);
 
         if (fichier == null) {
             return false;
@@ -208,7 +209,7 @@ public class FileService {
                 if (remove && !fichier.getOthersCanRead()) {
                     return false;
                 }
-                fichier.setOtherCanRead(!remove);
+                fichier.setOthersCanRead(!remove);
                 break;
 
             case 'w':
@@ -243,7 +244,7 @@ public class FileService {
 
         StringBuilder data = new StringBuilder();
 
-        for (FichierProtege fichier : files.values()) {
+        for (Fichier fichier : files.values()) {
 
             data.append(fichier.getName())
                     .append(";")
@@ -261,53 +262,53 @@ public class FileService {
         }
     }
 
-    private void loadFiles() {
-        if (!Files.exists(metadataPath)) {
-            return;
-        }
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(metadataPath);
-        } catch (IOException e) {
-            return;
-        }
+    // private void loadFiles() {
+    //     if (!Files.exists(metadataPath)) {
+    //         return;
+    //     }
+    //     List<String> lines;
+    //     try {
+    //         lines = Files.readAllLines(metadataPath);
+    //     } catch (IOException e) {
+    //         return;
+    //     }
 
-        for (String line : lines) {
-            String[] parts = line.split(";");
+    //     for (String line : lines) {
+    //         String[] parts = line.split(";");
 
-            if (parts.length != 3) {
-                continue;
-            }
+    //         if (parts.length != 3) {
+    //             continue;
+    //         }
 
-            String fileName = parts[0];
-            String owner = parts[1];
-            String[] permission = parts[2].split("\\|");
+    //         String fileName = parts[0];
+    //         String owner = parts[1];
+    //         String[] permission = parts[2].split("\\|");
 
-            if (permission.length != 2) {
-                continue;
-            }
+    //         if (permission.length != 2) {
+    //             continue;
+    //         }
 
-            String ownerPermission = permission[0];
-            String otherPermission = permission[1];
+    //         String ownerPermission = permission[0];
+    //         String otherPermission = permission[1];
 
-            boolean ownerCanRead = ownerPermission.charAt(0) == 'r';
-            boolean ownerCanWrite = ownerPermission.charAt(1) == 'w';
-            boolean ownerCanDelete = ownerPermission.charAt(2) == 'd';
+    //         boolean ownerCanRead = ownerPermission.charAt(0) == 'r';
+    //         boolean ownerCanWrite = ownerPermission.charAt(1) == 'w';
+    //         boolean ownerCanDelete = ownerPermission.charAt(2) == 'd';
 
-            boolean othersCanRead = otherPermission.charAt(0) == 'r';
-            boolean othersCanWrite = otherPermission.charAt(1) == 'w';
-            boolean othersCanDelete = otherPermission.charAt(2) == 'd';
+    //         boolean othersCanRead = otherPermission.charAt(0) == 'r';
+    //         boolean othersCanWrite = otherPermission.charAt(1) == 'w';
+    //         boolean othersCanDelete = otherPermission.charAt(2) == 'd';
 
-            FichierProtege fichier = new FichierProtege(fileName, owner, ownerCanRead, ownerCanWrite, ownerCanDelete,
-                    othersCanRead, othersCanWrite, othersCanDelete);
+    //         FichierProtege fichier = new FichierProtege(fileName, owner, ownerCanRead, ownerCanWrite, ownerCanDelete,
+    //                 othersCanRead, othersCanWrite, othersCanDelete);
 
-            files.put(fileName, fichier);
-        }
-    }
+    //         files.put(fileName, fichier);
+    //     }
+    //}
 
     public boolean deleteFile(String fileName, String login) {
 
-        FichierProtege fichier = getFile(fileName);
+        Fichier fichier = getFile(fileName);
 
         if (fichier == null) {
             return false;
