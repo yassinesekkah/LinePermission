@@ -17,7 +17,8 @@ public class DBConnection {
         try {
             connection = DriverManager.getConnection(URL);
 
-            createUserTable();
+            createUsersTable();
+            createFichiersTable();
 
         } catch (SQLException e) {
             System.out.println("Erreur de connexion à la base de données");
@@ -36,7 +37,7 @@ public class DBConnection {
         return connection;
     }
 
-    public void createUserTable() {
+    private void createUsersTable() {
 
         String sql = """
                         CREATE TABLE IF NOT EXISTS users(
@@ -46,14 +47,36 @@ public class DBConnection {
                 )
                         """;
 
-        try {
-            Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
+            
             statement.execute(sql);
-
             System.out.println("Table users créée");
 
         } catch (SQLException e) {
             System.out.println("Erreur creation table users");
         }
+    }
+
+    private void createFichiersTable() {
+
+        String sql = """
+                        CREATE TABLE IF NOT EXISTS fichiers(
+                    id  INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    owner_id INTEGER NOT NULL,
+                    permissions TEXT NOT NULL,
+                    FOREIGN KEY (owner_id) REFERENCES users(id)
+                );
+                        """;
+
+        try (Statement statement = connection.createStatement()){
+    
+            statement.execute(sql);
+            System.out.println("Table fichiers cree.");
+
+        } catch (SQLException e) {
+            System.out.println("Erreur sur creation table fichiers.");
+        }
+
     }
 }
