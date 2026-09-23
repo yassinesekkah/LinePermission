@@ -9,8 +9,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ConsoleApp app = new ConsoleApp();
-        app.run();
+        // ConsoleApp app = new ConsoleApp();
+        // app.run();
 
         // Connection connection = DBConnection.getInstance().getConnection();
 
@@ -20,7 +20,10 @@ public class Main {
         // else{
         //     System.out.println("Connexion échouée");
         // }
+            Integer x =19;
+            int y = ++x;
 
+            System.out.println(y);
 
         
        
