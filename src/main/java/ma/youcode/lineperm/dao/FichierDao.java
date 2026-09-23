@@ -1,35 +1,87 @@
 package ma.youcode.lineperm.dao;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
 import ma.youcode.lineperm.model.Fichier;
+import ma.youcode.lineperm.model.User;
 
 public class FichierDao extends AbstractDao<Fichier> {
 
-    @Override 
-    public void save(Fichier fichier){
+    public UserDao userDao = new UserDao();
+
+    @Override
+    public void save(Fichier fichier) {
 
         String sql = """
                     INSERT INTO fichiers(name, owner_id, permissions)
                     VALUES (?, ?, ?);
                 """;
-        try(PreparedStatement statement = con.prepareStatement(sql)){
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
 
             statement.setString(1, fichier.getName());
             statement.setInt(2, fichier.getOwner().getId());
             statement.setString(3, fichier.getPermissionsDisplay());
 
             statement.executeUpdate();
-        }
-        catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println("Erreur lors de l'ajout du fichier");
         }
     }
 
-    @Override 
-    public Optional<Fichier> findById(int id){
+    @Override
+    public Optional<Fichier> findById(int id) {
 
+        String sql = """
+                    SELECT * FROM fichiers
+                    WHERE id = ?;
+                """;
+
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+
+            statement.setInt(1, id);
+
+            ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                int fichierId = result.getInt("id");
+                String name = result.getString("name");
+                int ownerId = result.getInt("owner_id");
+                String permi = result.getString("permissions");
+
+                Optional<User> optionalOwner = userDao.findById(ownerId);
+
+                if (optionalOwner.isEmpty()) {
+                    return Optional.empty();
+                }
+                User user = optionalOwner.get();
+
+                boolean[] permissions = parsePermissions(permi);
+
+                Fichier fichier = new Fichier(fichierId, name, user, permissions[0], permissions[1], permissions[2],
+                        permissions[3], permissions[4], permissions[5]);
+
+                return Optional.of(fichier);
+
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur lors trouver le fichier");
+
+        }
+        return Optional.empty();
+    }
+
+    private boolean[] parsePermissions(String permissions) {
+
+        return new boolean[] {
+                permissions.charAt(0) == 'r',
+                permissions.charAt(1) == 'w',
+                permissions.charAt(2) == 'd',
+                permissions.charAt(4) == 'r',
+                permissions.charAt(5) == 'w',
+                permissions.charAt(6) == 'd'
+        };
     }
 }
