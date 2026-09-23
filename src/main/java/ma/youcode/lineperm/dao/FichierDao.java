@@ -3,6 +3,8 @@ package ma.youcode.lineperm.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import ma.youcode.lineperm.model.Fichier;
@@ -83,5 +85,50 @@ public class FichierDao extends AbstractDao<Fichier> {
                 permissions.charAt(5) == 'w',
                 permissions.charAt(6) == 'd'
         };
+    }
+
+    public List<Fichier> findByOwner(int ownerId) {
+
+        String sql = """
+                    SELECT * FROM fichiers
+                    WHERE owner_id = ?;
+                """;
+
+        List<Fichier> fichierList = new ArrayList<>();
+
+        // owner get
+        Optional<User> ownerOptional = userDao.findById(ownerId);
+
+        if (ownerOptional.isEmpty()) {
+            return fichierList;
+        }
+        
+        User user = ownerOptional.get();
+
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+
+            statement.setInt(1, ownerId);
+            ResultSet result = statement.executeQuery();
+
+            while (result.next()) {
+
+                int id = result.getInt("id");
+                String name = result.getString("name");
+                String permission = result.getString("permissions");
+
+                boolean[] permissionsArray = parsePermissions(permission);
+
+                Fichier fichier = new Fichier(id, name, user, permissionsArray[0], permissionsArray[1],
+                        permissionsArray[2], permissionsArray[3], permissionsArray[4], permissionsArray[5]);
+
+                fichierList.add(fichier);
+
+            }
+            return fichierList;
+
+        } catch (SQLException e) {
+            System.out.println("Erreur");
+        }
+        return fichierList;
     }
 }
