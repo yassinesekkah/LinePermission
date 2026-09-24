@@ -51,7 +51,8 @@ public class Main {
 
         System.out.println(ismFichier.getName());
 
-        logDao.save(new Log(LocalDate.now(), LocalTime.now(), ismail, ActionTypes.LECTURE, ismFichier, Status.OK));
+        logDao.save(new Log(LocalDate.now(), LocalTime.now(), ismail, ActionTypes.LECTURE, ismFichier, Status.REFUSE));
+        logDao.save(new Log(LocalDate.now(), LocalTime.now(), ismail, ActionTypes.LECTURE, ismFichier, Status.REFUSE));
 
         Optional<Log> logOp = logDao.findById(1);
 
@@ -65,5 +66,7 @@ public class Main {
 
         
         System.out.println(logDao.countTotalActions());
+
+        System.out.println("refused logs : " + logDao.countRefusedAccess());
     }
 }

@@ -123,7 +123,7 @@ public class LogDao extends AbstractDao<Log>{
         String sql =  """
                     SELECT count(*) AS total FROM logs;
                 """;
-                
+
         try(Statement statement = con.createStatement()){
 
             ResultSet result = statement.executeQuery(sql);
@@ -138,4 +138,25 @@ public class LogDao extends AbstractDao<Log>{
         return 0;
     }
 
+    public long countRefusedAccess(){
+
+        String sql = """
+                    SELECT count(*) AS tot_refuse FROM logs
+                    WHERE resultat = 'REFUSE';
+                """;
+        
+        try(Statement statement = con.createStatement()){
+
+            ResultSet result = statement.executeQuery(sql);
+
+            if(result.next()){
+                return result.getLong("tot_refuse");
+            }
+
+        }catch(SQLException e){
+            System.out.println("Erreur");
+        }
+
+        return 0;
+    }
 }
