@@ -1,8 +1,10 @@
 package ma.youcode.lineperm.dao;
 
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,8 +18,8 @@ import ma.youcode.lineperm.model.User;
 
 public class LogDao extends AbstractDao<Log>{
 
-    UserDao userDao = new UserDao();
-    FichierDao fichierDao = new FichierDao();
+    private final UserDao userDao = new UserDao();
+    private final FichierDao fichierDao = new FichierDao();
 
     @Override 
     public void save(Log log){
@@ -115,4 +117,25 @@ public class LogDao extends AbstractDao<Log>{
 
         return Optional.empty();
     }
+
+    public long countTotalActions(){
+
+        String sql =  """
+                    SELECT count(*) AS total FROM logs;
+                """;
+                
+        try(Statement statement = con.createStatement()){
+
+            ResultSet result = statement.executeQuery(sql);
+
+            if(result.next()){
+                return result.getLong("total");
+            }
+
+        }catch(SQLException e){
+            System.out.println("Erreur");
+        }
+        return 0;
+    }
+
 }
