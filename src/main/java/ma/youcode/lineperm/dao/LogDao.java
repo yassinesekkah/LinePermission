@@ -1,6 +1,5 @@
 package ma.youcode.lineperm.dao;
 
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,6 +7,8 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import ma.youcode.lineperm.model.ActionTypes;
@@ -16,13 +17,13 @@ import ma.youcode.lineperm.model.Log;
 import ma.youcode.lineperm.model.Status;
 import ma.youcode.lineperm.model.User;
 
-public class LogDao extends AbstractDao<Log>{
+public class LogDao extends AbstractDao<Log> {
 
     private final UserDao userDao = new UserDao();
     private final FichierDao fichierDao = new FichierDao();
 
-    @Override 
-    public void save(Log log){
+    @Override
+    public void save(Log log) {
 
         String sql = """
                     INSERT INTO logs (user_id, fichier_id, action, resultat, created_at)
@@ -31,8 +32,8 @@ public class LogDao extends AbstractDao<Log>{
 
         LocalDateTime createdAt = LocalDateTime.of(log.getDate(), log.getTime());
 
-        try(PreparedStatement statement = con.prepareStatement(sql)){
-            
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+
             statement.setInt(1, log.getUser().getId());
             statement.setInt(2, log.getFichier().getId());
             statement.setString(3, log.getAction().name());
@@ -41,56 +42,53 @@ public class LogDao extends AbstractDao<Log>{
 
             int rows = statement.executeUpdate();
 
-            if(rows == 1){
+            if (rows == 1) {
                 System.out.println("log ajouter avec succese");
-            }
-            else{
+            } else {
                 System.out.println("Erreur lor l'ajoute de log");
             }
-            
-        }catch(SQLException e){
+
+        } catch (SQLException e) {
             System.out.println("Erreur lors de l'ajout du log: " + e.getMessage());
         }
     }
 
-    @Override 
-    public Optional<Log> findById(int id){
+    @Override
+    public Optional<Log> findById(int id) {
 
         String sql = """
                     SELECT * FROM logs
                     WHERE id = ?;
                 """;
 
-        try(PreparedStatement statement = con.prepareStatement(sql)){
-            
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+
             statement.setInt(1, id);
             ResultSet result = statement.executeQuery();
 
-            if(result.next()){
+            if (result.next()) {
                 int userId = result.getInt("user_id");
-                //user prepare
+                // user prepare
                 Optional<User> userOptional = userDao.findById(userId);
 
-                if(userOptional.isEmpty()){
+                if (userOptional.isEmpty()) {
                     System.out.println("Erreur lors trouver utilisateur");
                     return Optional.empty();
                 }
-                
+
                 User user = userOptional.get();
 
-                //fichier object prepare
+                // fichier object prepare
                 int fichierId = result.getInt("fichier_id");
 
                 Optional<Fichier> fichierOptional = fichierDao.findById(fichierId);
 
-                if(fichierOptional.isEmpty()){
+                if (fichierOptional.isEmpty()) {
                     System.out.println("Erreur lors trouver le fichier");
                     return Optional.empty();
                 }
 
                 Fichier fichier = fichierOptional.get();
-
-
 
                 String actionString = result.getString("action");
                 ActionTypes action = ActionTypes.valueOf(actionString);
@@ -98,86 +96,120 @@ public class LogDao extends AbstractDao<Log>{
                 String resultatString = result.getString("resultat");
                 Status resultat = Status.valueOf(resultatString);
 
-                //prepare date & time
+                // prepare date & time
                 String createdAtString = result.getString("created_at");
                 LocalDateTime createdAt = LocalDateTime.parse(createdAtString);
                 LocalDate date = createdAt.toLocalDate();
                 LocalTime time = createdAt.toLocalTime();
 
-                //creation d'objet log
-                Log log = new Log(id, date, time,user , action, fichier, resultat);
+                // creation d'objet log
+                Log log = new Log(id, date, time, user, action, fichier, resultat);
 
                 return Optional.of(log);
 
             }
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println("Erreur lors trouver log");
         }
 
         return Optional.empty();
     }
 
-    public long countTotalActions(){
+    public long countTotalActions() {
 
-        String sql =  """
+        String sql = """
                     SELECT count(*) AS total FROM logs;
                 """;
 
-        try(Statement statement = con.createStatement()){
+        try (Statement statement = con.createStatement()) {
 
             ResultSet result = statement.executeQuery(sql);
 
-            if(result.next()){
+            if (result.next()) {
                 return result.getLong("total");
             }
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println("Erreur");
         }
         return 0;
     }
 
-    public long countRefusedAccess(){
+    public long countRefusedAccess() {
 
         String sql = """
                     SELECT count(*) AS tot_refuse FROM logs
                     WHERE resultat = 'REFUSE';
                 """;
-        
-        try(Statement statement = con.createStatement()){
+
+        try (Statement statement = con.createStatement()) {
 
             ResultSet result = statement.executeQuery(sql);
 
-            if(result.next()){
+            if (result.next()) {
                 return result.getLong("tot_refuse");
             }
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println("Erreur");
         }
 
         return 0;
     }
 
-    public long countDistinctUsers(){
+    public long countDistinctUsers() {
 
         String sql = """
                     SELECT count(DISTINCT user_id) AS total_users from logs;
                 """;
 
-        try(Statement statement = con.createStatement()){
+        try (Statement statement = con.createStatement()) {
 
             ResultSet result = statement.executeQuery(sql);
 
-            if(result.next()){
+            if (result.next()) {
                 return result.getLong("total_users");
             }
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println("Erreur");
         }
 
         return 0;
+    }
+
+    public Map<String, Long> countActionsByUser() {
+
+        String sql = """
+                    SELECT user_id, count(*) AS total_by_user FROM logs
+                    GROUP BY user_id;
+                """;
+        Map<String, Long> actionByUser = new HashMap<>();
+
+        try (Statement statement = con.createStatement()) {
+
+            ResultSet result = statement.executeQuery(sql);
+
+            while (result.next()) {
+
+                int userId = result.getInt("user_id");
+                Long count = result.getLong("total_by_user");
+
+                Optional<User> userOp = userDao.findById(userId);
+                if (userOp.isEmpty()) {
+                    continue;
+                }
+                User user = userOp.get();
+                String userName = user.getLogin();
+
+                actionByUser.put(userName, count);
+            }
+            return actionByUser;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return actionByUser;
     }
 }
