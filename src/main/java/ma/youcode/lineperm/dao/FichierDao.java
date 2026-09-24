@@ -102,7 +102,7 @@ public class FichierDao extends AbstractDao<Fichier> {
         if (ownerOptional.isEmpty()) {
             return fichierList;
         }
-        
+
         User user = ownerOptional.get();
 
         try (PreparedStatement statement = con.prepareStatement(sql)) {
@@ -130,5 +130,31 @@ public class FichierDao extends AbstractDao<Fichier> {
             System.out.println("Erreur");
         }
         return fichierList;
+    }
+
+    public void updatePermissions(int id, String permissions) {
+
+        String sql = """
+                    UPDATE fichiers
+                    SET permissions = ?
+                    WHERE id = ?;
+                """;
+
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+
+            statement.setString(1, permissions);
+            statement.setInt(2, id);
+            int rows = statement.executeUpdate();
+
+            if(rows == 1){
+                System.out.println("fichier modifie");
+            }
+            else{
+                System.out.println("fichier introuvable");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erreur");
+        }
     }
 }
