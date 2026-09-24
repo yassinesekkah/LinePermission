@@ -12,15 +12,18 @@ public class Main {
         // ConsoleApp app = new ConsoleApp();
         // app.run();
 
-        Connection connection = DBConnection.getInstance().getConnection();
+        // Connection connection = DBConnection.getInstance().getConnection();
 
-        if(connection != null){
-            System.out.println("Connexion SQLite réussie");
-        }
-        else{
-            System.out.println("Connexion échouée");
-        }
+        // if(connection != null){
+        //     System.out.println("Connexion SQLite réussie");
+        // }
+        // else{
+        //     System.out.println("Connexion échouée");
+        // }
+            Integer x =19;
+            int y = ++x;
 
+            System.out.println(y);
 
         
        
