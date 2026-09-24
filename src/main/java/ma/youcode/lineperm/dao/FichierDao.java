@@ -14,6 +14,7 @@ public class FichierDao extends AbstractDao<Fichier> {
 
     public UserDao userDao = new UserDao();
 
+    //tested
     @Override
     public void save(Fichier fichier) {
 
@@ -23,16 +24,21 @@ public class FichierDao extends AbstractDao<Fichier> {
                 """;
         try (PreparedStatement statement = con.prepareStatement(sql)) {
 
+            System.out.println("name = " + fichier.getName());
+            System.out.println("owner id = " + fichier.getOwner().getId());
+            System.out.println("permissions = " + fichier.getPermissionsDisplay());
+
             statement.setString(1, fichier.getName());
             statement.setInt(2, fichier.getOwner().getId());
             statement.setString(3, fichier.getPermissionsDisplay());
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Erreur lors de l'ajout du fichier");
+            System.out.println("Erreur fichier: " + e.getMessage());
         }
     }
 
+    //tested
     @Override
     public Optional<Fichier> findById(int id) {
 
@@ -75,6 +81,7 @@ public class FichierDao extends AbstractDao<Fichier> {
         return Optional.empty();
     }
 
+    //tested
     private boolean[] parsePermissions(String permissions) {
 
         return new boolean[] {
@@ -87,6 +94,7 @@ public class FichierDao extends AbstractDao<Fichier> {
         };
     }
 
+    //tested
     public List<Fichier> findByOwner(int ownerId) {
 
         String sql = """
@@ -132,6 +140,7 @@ public class FichierDao extends AbstractDao<Fichier> {
         return fichierList;
     }
 
+    //tested
     public void updatePermissions(int id, String permissions) {
 
         String sql = """
@@ -146,15 +155,14 @@ public class FichierDao extends AbstractDao<Fichier> {
             statement.setInt(2, id);
             int rows = statement.executeUpdate();
 
-            if(rows == 1){
+            if (rows == 1) {
                 System.out.println("fichier modifie");
-            }
-            else{
+            } else {
                 System.out.println("fichier introuvable");
             }
 
         } catch (SQLException e) {
-            System.out.println("Erreur");
+            System.out.println("Erreur lors de la modification des permissions");
         }
     }
 }
