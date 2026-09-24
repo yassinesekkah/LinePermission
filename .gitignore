@@ -13,3 +13,9 @@ data/auditdb.db
 # OS files
 .DS_Store
 Thumbs.db
+
+#DB
+*.db
+
+#Test
+src/main/java/ma/youcode/lineperm/test/
