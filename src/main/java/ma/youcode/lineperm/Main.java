@@ -68,5 +68,7 @@ public class Main {
         System.out.println(logDao.countTotalActions());
 
         System.out.println("refused logs : " + logDao.countRefusedAccess());
+
+        System.out.println("totale users : " + logDao.countDistinctUsers());
     }
 }

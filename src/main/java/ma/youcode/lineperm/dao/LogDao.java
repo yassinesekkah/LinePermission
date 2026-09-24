@@ -159,4 +159,25 @@ public class LogDao extends AbstractDao<Log>{
 
         return 0;
     }
+
+    public long countDistinctUsers(){
+
+        String sql = """
+                    SELECT count(DISTINCT user_id) AS total_users from logs;
+                """;
+
+        try(Statement statement = con.createStatement()){
+
+            ResultSet result = statement.executeQuery(sql);
+
+            if(result.next()){
+                return result.getLong("total_users");
+            }
+
+        }catch(SQLException e){
+            System.out.println("Erreur");
+        }
+
+        return 0;
+    }
 }
