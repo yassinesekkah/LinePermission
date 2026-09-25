@@ -8,7 +8,9 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -250,5 +252,68 @@ public class LogDao extends AbstractDao<Log> {
         }
 
         return totalByFichier;
+    }
+
+    public List<Log> getRefusedAccessByUser(String name){
+
+        String sql = """
+                    SELECT * FROM logs
+                    WHERE resultat = 'REFUSE' AND user_id = ?;
+                """;
+        
+        Optional<User> userOp = userDao.findByLogin(name);
+
+        if(userOp.isEmpty()){
+            return new ArrayList<>();
+        }
+        User user = userOp.get();
+        int userId = user.getId();
+
+        List<Log> refusedByUser = new ArrayList<>();
+
+        try(PreparedStatement statement = con.prepareStatement(sql)){
+
+            statement.setInt(1, userId);
+            ResultSet result = statement.executeQuery();
+
+            while (result.next()) {
+                
+                int id = result.getInt("id");
+                int fichierId = result.getInt("fichier_id");
+                String actionString = result.getString("action");
+                String resultatString = result.getString("resultat");
+                String createdAtString = result.getString("created_at");
+
+                //prepare fichier
+                Optional<Fichier> fichierOp = fichierDao.findById(fichierId);
+
+                if(fichierOp.isEmpty()){
+                    continue;
+                }
+                Fichier fichier = fichierOp.get();
+
+                //prepare Action
+                ActionTypes action = ActionTypes.valueOf(actionString);
+
+                //prepare Status
+                Status state = Status.valueOf(resultatString);
+
+                //prepare date and time
+                LocalDateTime localDateTime = LocalDateTime.parse(createdAtString);
+                LocalDate localDate = localDateTime.toLocalDate();
+                LocalTime localTime = localDateTime.toLocalTime();
+                
+                Log log = new Log(id, localDate, localTime, user, action, fichier, state);
+
+                refusedByUser.add(log);
+            }
+
+
+
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+
+        return refusedByUser;
     }
 }
