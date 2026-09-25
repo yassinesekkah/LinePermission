@@ -5,8 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import javax.naming.spi.DirStateFactory.Result;
-
 import ma.youcode.lineperm.model.User;
 
 public class UserDao extends AbstractDao<User> {
