@@ -309,8 +309,9 @@ public class LogDao extends AbstractDao<Log> {
     public Optional<String> getMostActiveUser() {
 
         String sql = """
-                    SELECT user_id, count(*) AS total FROM logs
-                    GROUP BY user_id
+                    SELECT users.login AS login, count(*) AS total FROM logs
+                    JOIN users ON users.id = logs.user_id
+                    GROUP BY users.login
                     ORDER BY total DESC
                     LIMIT 1;
                 """;
@@ -320,15 +321,8 @@ public class LogDao extends AbstractDao<Log> {
             ResultSet result = statement.executeQuery(sql);
 
             if (result.next()) {
-                int userId = result.getInt("user_id");
-                Optional<User> userOp = userDao.findById(userId);
-
-                if (userOp.isEmpty()) {
-                    return Optional.empty();
-                }
-                User user = userOp.get();
-                String userName = user.getLogin();
-
+                
+                String userName = result.getString("login");
                 return Optional.of(userName);
             }
 
