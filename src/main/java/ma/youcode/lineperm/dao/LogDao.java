@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -185,8 +186,9 @@ public class LogDao extends AbstractDao<Log> {
     public Map<String, Long> countActionsByUser() {
 
         String sql = """
-                    SELECT user_id, count(*) AS total_by_user FROM logs
-                    GROUP BY user_id;
+                    SELECT users.login AS login, count(*) AS total_by_user FROM logs
+                    JOIN users ON logs.user_id = users.id
+                    GROUP BY users.login;
                 """;
         Map<String, Long> actionByUser = new HashMap<>();
 
@@ -196,15 +198,8 @@ public class LogDao extends AbstractDao<Log> {
 
             while (result.next()) {
 
-                int userId = result.getInt("user_id");
+                String userName = result.getString("login");
                 Long count = result.getLong("total_by_user");
-
-                Optional<User> userOp = userDao.findById(userId);
-                if (userOp.isEmpty()) {
-                    continue;
-                }
-                User user = userOp.get();
-                String userName = user.getLogin();
 
                 actionByUser.put(userName, count);
             }
@@ -218,12 +213,14 @@ public class LogDao extends AbstractDao<Log> {
     public Map<String, Long> getTop3ConsultedFiles() {
 
         String sql = """
-                    SELECT fichier_id, count(*) AS total_logs FROM logs
-                    GROUP BY fichier_id
+                    SELECT fichiers.id AS fichier_id, fichiers.name AS fichier_name, COUNT(*) AS total_logs
+                    FROM logs
+                    JOIN fichiers ON logs.fichier_id = fichiers.id
+                    GROUP BY fichiers.id, fichiers.name
                     ORDER BY total_logs DESC
                     LIMIT 3;
                 """;
-        Map<String, Long> totalByFichier = new HashMap<>();
+        Map<String, Long> totalByFichier = new LinkedHashMap<>();
 
         try (Statement statement = con.createStatement()) {
 
@@ -231,19 +228,14 @@ public class LogDao extends AbstractDao<Log> {
 
             while (result.next()) {
 
-                // fichierName prepare
+                String fichierName = result.getString("fichier_name");
                 int fichierId = result.getInt("fichier_id");
 
-                Optional<Fichier> fichierOp = fichierDao.findById(fichierId);
-                if (fichierOp.isEmpty()) {
-                    continue;
-                }
-                Fichier fichier = fichierOp.get();
-                String fichierName = fichier.getName();
+                String key = fichierId + " - " + fichierName;
 
                 Long totalFichierLogs = result.getLong("total_logs");
 
-                totalByFichier.put(fichierName, totalFichierLogs);
+                totalByFichier.put(key, totalFichierLogs);
             }
 
         } catch (SQLException e) {
@@ -317,8 +309,9 @@ public class LogDao extends AbstractDao<Log> {
     public Optional<String> getMostActiveUser() {
 
         String sql = """
-                    SELECT user_id, count(*) AS total FROM logs
-                    GROUP BY user_id
+                    SELECT users.login AS login, count(*) AS total FROM logs
+                    JOIN users ON users.id = logs.user_id
+                    GROUP BY users.login
                     ORDER BY total DESC
                     LIMIT 1;
                 """;
@@ -328,15 +321,8 @@ public class LogDao extends AbstractDao<Log> {
             ResultSet result = statement.executeQuery(sql);
 
             if (result.next()) {
-                int userId = result.getInt("user_id");
-                Optional<User> userOp = userDao.findById(userId);
-
-                if (userOp.isEmpty()) {
-                    return Optional.empty();
-                }
-                User user = userOp.get();
-                String userName = user.getLogin();
-
+                
+                String userName = result.getString("login");
                 return Optional.of(userName);
             }
 
@@ -356,15 +342,15 @@ public class LogDao extends AbstractDao<Log> {
 
         Map<ActionTypes, Long> res = new HashMap<>();
 
-        try(Statement statement = con.createStatement()){
+        try (Statement statement = con.createStatement()) {
 
             ResultSet result = statement.executeQuery(sql);
 
-            while(result.next()){
+            while (result.next()) {
 
                 String actionString = result.getString("action");
 
-                //prepare action
+                // prepare action
                 ActionTypes action = ActionTypes.valueOf("total");
 
                 Long count = result.getLong(actionString);
@@ -372,7 +358,7 @@ public class LogDao extends AbstractDao<Log> {
                 res.put(action, count);
             }
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
 
