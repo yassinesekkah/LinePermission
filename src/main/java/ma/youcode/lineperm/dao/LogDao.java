@@ -1,5 +1,6 @@
 package ma.youcode.lineperm.dao;
 
+import java.lang.StackWalker.Option;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -205,11 +206,49 @@ public class LogDao extends AbstractDao<Log> {
 
                 actionByUser.put(userName, count);
             }
-            return actionByUser;
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return actionByUser;
+    }
+
+    public Map<String, Long> getTop3ConsultedFiles(){
+
+        String sql = """
+                    SELECT fichier_id, count(*) AS total_logs FROM logs
+                    GROUP BY fichier_id
+                    ORDER BY total_logs DESC
+                    LIMIT 3;
+                """;
+        Map<String, Long> totalByFichier = new HashMap<>();
+
+        try(Statement statement = con.createStatement()){
+
+            ResultSet result = statement.executeQuery(sql);
+
+            while (result.next()) {
+
+                //fichierName prepare
+                int fichierId = result.getInt("fichier_id");
+
+                Optional<Fichier> fichierOp = fichierDao.findById(fichierId);
+                if(fichierOp.isEmpty()){
+                    continue;
+                }
+                Fichier fichier = fichierOp.get();
+                String fichierName = fichier.getName();
+
+                Long totalFichierLogs = result.getLong("total_logs");
+
+                totalByFichier.put(fichierName, totalFichierLogs);
+            }
+
+
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+
+        return totalByFichier;
     }
 }

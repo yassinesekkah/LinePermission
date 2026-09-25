@@ -9,13 +9,12 @@ import java.util.Optional;
 import ma.youcode.lineperm.dao.FichierDao;
 import ma.youcode.lineperm.dao.LogDao;
 import ma.youcode.lineperm.dao.UserDao;
-import ma.youcode.lineperm.database.DBConnection;
 import ma.youcode.lineperm.model.ActionTypes;
 import ma.youcode.lineperm.model.Fichier;
 import ma.youcode.lineperm.model.Log;
 import ma.youcode.lineperm.model.Status;
 import ma.youcode.lineperm.model.User;
-import ma.youcode.lineperm.ui.ConsoleApp;
+
 
 public class Main {
 
@@ -77,15 +76,10 @@ public class Main {
         }
         Log lll = logOp.get();
 
-        // System.out.println(lll.getUser().getLogin());
+        // System.out.println(logDao.countActionsByUser());
+
+        System.out.println(logDao.getTop3ConsultedFiles());
         
-        
-        // System.out.println(logDao.countTotalActions());
 
-        // System.out.println("refused logs : " + logDao.countRefusedAccess());
-
-        // System.out.println("totale users : " + logDao.countDistinctUsers());
-
-        System.out.println(logDao.countActionsByUser());
     }
 }
