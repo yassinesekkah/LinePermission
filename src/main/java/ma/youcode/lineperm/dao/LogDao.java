@@ -215,7 +215,7 @@ public class LogDao extends AbstractDao<Log> {
         return actionByUser;
     }
 
-    public Map<String, Long> getTop3ConsultedFiles(){
+    public Map<String, Long> getTop3ConsultedFiles() {
 
         String sql = """
                     SELECT fichier_id, count(*) AS total_logs FROM logs
@@ -225,17 +225,17 @@ public class LogDao extends AbstractDao<Log> {
                 """;
         Map<String, Long> totalByFichier = new HashMap<>();
 
-        try(Statement statement = con.createStatement()){
+        try (Statement statement = con.createStatement()) {
 
             ResultSet result = statement.executeQuery(sql);
 
             while (result.next()) {
 
-                //fichierName prepare
+                // fichierName prepare
                 int fichierId = result.getInt("fichier_id");
 
                 Optional<Fichier> fichierOp = fichierDao.findById(fichierId);
-                if(fichierOp.isEmpty()){
+                if (fichierOp.isEmpty()) {
                     continue;
                 }
                 Fichier fichier = fichierOp.get();
@@ -246,24 +246,23 @@ public class LogDao extends AbstractDao<Log> {
                 totalByFichier.put(fichierName, totalFichierLogs);
             }
 
-
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
 
         return totalByFichier;
     }
 
-    public List<Log> getRefusedAccessByUser(String name){
+    public List<Log> getRefusedAccessByUser(String name) {
 
         String sql = """
                     SELECT * FROM logs
                     WHERE resultat = 'REFUSE' AND user_id = ?;
                 """;
-        
+
         Optional<User> userOp = userDao.findByLogin(name);
 
-        if(userOp.isEmpty()){
+        if (userOp.isEmpty()) {
             return new ArrayList<>();
         }
         User user = userOp.get();
@@ -271,49 +270,80 @@ public class LogDao extends AbstractDao<Log> {
 
         List<Log> refusedByUser = new ArrayList<>();
 
-        try(PreparedStatement statement = con.prepareStatement(sql)){
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
 
             statement.setInt(1, userId);
             ResultSet result = statement.executeQuery();
 
             while (result.next()) {
-                
+
                 int id = result.getInt("id");
                 int fichierId = result.getInt("fichier_id");
                 String actionString = result.getString("action");
                 String resultatString = result.getString("resultat");
                 String createdAtString = result.getString("created_at");
 
-                //prepare fichier
+                // prepare fichier
                 Optional<Fichier> fichierOp = fichierDao.findById(fichierId);
 
-                if(fichierOp.isEmpty()){
+                if (fichierOp.isEmpty()) {
                     continue;
                 }
                 Fichier fichier = fichierOp.get();
 
-                //prepare Action
+                // prepare Action
                 ActionTypes action = ActionTypes.valueOf(actionString);
 
-                //prepare Status
+                // prepare Status
                 Status state = Status.valueOf(resultatString);
 
-                //prepare date and time
+                // prepare date and time
                 LocalDateTime localDateTime = LocalDateTime.parse(createdAtString);
                 LocalDate localDate = localDateTime.toLocalDate();
                 LocalTime localTime = localDateTime.toLocalTime();
-                
+
                 Log log = new Log(id, localDate, localTime, user, action, fichier, state);
 
                 refusedByUser.add(log);
             }
 
-
-
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
 
         return refusedByUser;
+    }
+
+    public Optional<String> getMostActiveUser() {
+
+        String sql = """
+                    SELECT user_id, count(*) AS total FROM logs
+                    GROUP BY user_id
+                    ORDER BY total DESC
+                    LIMIT 1;
+                """;
+
+        try (Statement statement = con.createStatement()) {
+
+            ResultSet result = statement.executeQuery(sql);
+
+            if (result.next()) {
+                int userId = result.getInt("user_id");
+                Optional<User> userOp = userDao.findById(userId);
+
+                if (userOp.isEmpty()) {
+                    return Optional.empty();
+                }
+                User user = userOp.get();
+                String userName = user.getLogin();
+
+                return Optional.of(userName);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return Optional.empty();
     }
 }

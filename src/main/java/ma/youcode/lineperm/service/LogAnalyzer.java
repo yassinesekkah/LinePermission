@@ -81,7 +81,7 @@ public class LogAnalyzer {
                 .collect(Collectors.groupingBy(
                         log -> log.getUser().getLogin(),
                         Collectors.counting()));
-
+                    
         return first.entrySet().stream()
                     .max(Map.Entry.comparingByValue())
                     .map(entry -> entry.getKey());
