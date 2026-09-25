@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import ma.youcode.lineperm.model.Log;
@@ -48,7 +47,7 @@ public class LogAnalyzer {
                         Collectors.counting()));
     }
 
-    public Map<String, Long> getTop3ConsultedFiles() {
+    public Map<String, Long> getTop3ConsultedFilesdhd() {
 
         Comparator<Map.Entry<String, Long>> comparator = Map.Entry.comparingByValue();
 
@@ -82,7 +81,7 @@ public class LogAnalyzer {
                 .collect(Collectors.groupingBy(
                         log -> log.getUser().getLogin(),
                         Collectors.counting()));
-
+                    
         return first.entrySet().stream()
                     .max(Map.Entry.comparingByValue())
                     .map(entry -> entry.getKey());
