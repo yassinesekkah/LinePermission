@@ -346,4 +346,36 @@ public class LogDao extends AbstractDao<Log> {
 
         return Optional.empty();
     }
+
+    public Map<ActionTypes, Long> countActionByType() {
+
+        String sql = """
+                    SELECT action, count(*) AS total FROM logs
+                    GROUP BY action;
+                """;
+
+        Map<ActionTypes, Long> res = new HashMap<>();
+
+        try(Statement statement = con.createStatement()){
+
+            ResultSet result = statement.executeQuery(sql);
+
+            while(result.next()){
+
+                String actionString = result.getString("action");
+
+                //prepare action
+                ActionTypes action = ActionTypes.valueOf("total");
+
+                Long count = result.getLong(actionString);
+
+                res.put(action, count);
+            }
+
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+
+        return res;
+    }
 }
