@@ -185,8 +185,9 @@ public class LogDao extends AbstractDao<Log> {
     public Map<String, Long> countActionsByUser() {
 
         String sql = """
-                    SELECT user_id, count(*) AS total_by_user FROM logs
-                    GROUP BY user_id;
+                    SELECT users.login AS login, count(*) AS total_by_user FROM logs
+                    JOIN users ON logs.user_id = users.id
+                    GROUP BY users.login;
                 """;
         Map<String, Long> actionByUser = new HashMap<>();
 
@@ -196,15 +197,8 @@ public class LogDao extends AbstractDao<Log> {
 
             while (result.next()) {
 
-                int userId = result.getInt("user_id");
+                String userName = result.getString("login");
                 Long count = result.getLong("total_by_user");
-
-                Optional<User> userOp = userDao.findById(userId);
-                if (userOp.isEmpty()) {
-                    continue;
-                }
-                User user = userOp.get();
-                String userName = user.getLogin();
 
                 actionByUser.put(userName, count);
             }
