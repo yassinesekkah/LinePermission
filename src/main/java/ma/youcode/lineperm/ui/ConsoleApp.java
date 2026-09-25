@@ -4,6 +4,7 @@ import ma.youcode.lineperm.model.Log;
 import ma.youcode.lineperm.model.Fichier;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.service.FileService;
@@ -331,7 +332,10 @@ public class ConsoleApp {
                     boolean logged = userService.login(log, pass);
 
                     if (logged) {
-                        currentUser = userService.getUser(log);
+                        // Optional<User> currentUserOp = userService.getUser(log);
+                        
+                        currentUser = userService.getUser(log).orElse(null);
+                        
                         System.out.println("Connexion reussie");
                     } else {
                         System.out.println("Identifiants incorrects");
