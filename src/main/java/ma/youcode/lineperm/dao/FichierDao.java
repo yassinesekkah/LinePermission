@@ -1,8 +1,10 @@
 package ma.youcode.lineperm.dao;
 
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -118,6 +120,53 @@ public class FichierDao extends AbstractDao<Fichier> {
         }
         return Optional.empty();
     }
+    
+    public List<Fichier> findAll(){
+
+        String sql = """
+                    SELECT * FROM fichiers;
+                """;
+        
+        List<Fichier> fichiers = new ArrayList<>();
+
+        try(Statement statement = con.createStatement()){
+            
+            ResultSet result = statement.executeQuery(sql);
+
+            while(result.next()){
+
+                int id = result.getInt("id");
+                String name = result.getString("name");
+                int ownerId = result.getInt("owner_id");
+                String permissionsString = result.getString("permissions");
+
+                //prepare owner
+                Optional<User> userOp = userDao.findById(ownerId);
+
+                if(userOp.isEmpty()){
+                    continue;
+                }
+
+                User owner = userOp.get();
+
+                //prepare  permissions
+                boolean[] permissions = parsePermissions(permissionsString);
+
+                //create fichier
+                Fichier fichier = new Fichier(id, name, owner, permissions[0], permissions[1], permissions[2], permissions[3], permissions[4], permissions[5]);
+
+                fichiers.add(fichier);
+
+            }
+            
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+
+        return fichiers;
+    }
+    
+    
     //tested
     private boolean[] parsePermissions(String permissions) {
 

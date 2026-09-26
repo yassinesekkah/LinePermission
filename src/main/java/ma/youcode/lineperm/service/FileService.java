@@ -35,7 +35,7 @@ public class FileService {
 
     public Fichier getFile(String name) {
 
-        return files.get(name);
+        return fichierDao.findByName(name).orElse(null);
     }
 
     public boolean isFileNameValid(String name) {
@@ -47,7 +47,7 @@ public class FileService {
 
     public boolean createFile(String name, User owner) {
 
-        if (fileExists(name)) {
+        if(fichierDao.findByName(name).isPresent()){
             return false;
         }
 
@@ -55,27 +55,28 @@ public class FileService {
             return false;
         }
 
-        Path dataDir = Path.of("data");
-        Path filePath = dataDir.resolve(name);
+        // Path dataDir = Path.of("data");
+        // Path filePath = dataDir.resolve(name);
 
         try {
-            Files.createDirectories(dataDir);
-            Files.createFile(filePath);
+            // Files.createDirectories(dataDir);
+            // Files.createFile(filePath);
 
             Fichier fichier = new Fichier(name, owner);
-            files.put(name, fichier);
+            // files.put(name, fichier);
 
-            saveFiles();
+            // saveFiles();
+            fichierDao.save(fichier);
 
             return true;
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             return false;
         }
 
     }
 
-    public Collection<Fichier> getAllFiles() {
+    public Collection<Fichier> getAllFiles() { //////////////////////////////////////////////
 
         return files.values();
     }
