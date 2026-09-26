@@ -1,6 +1,7 @@
 package ma.youcode.lineperm.ui;
 
 import ma.youcode.lineperm.model.Log;
+import ma.youcode.lineperm.dao.FichierDao;
 import ma.youcode.lineperm.model.Fichier;
 
 import java.util.List;
@@ -18,7 +19,8 @@ public class ConsoleApp {
     private final UserService userService = new UserService();
     private User currentUser = null;
     private final LogService logService = new LogService();
-    private final FileService fileService = new FileService(logService);
+    private final FichierDao fichierDao = new FichierDao();
+    private final FileService fileService = new FileService(logService, fichierDao);
 
     private final LogAnalyzer logAnalyzer = new LogAnalyzer(logService.getLogs());
 
@@ -335,7 +337,7 @@ public class ConsoleApp {
                         // Optional<User> currentUserOp = userService.getUser(log);
                         
                         currentUser = userService.getUser(log).orElse(null);
-                        
+
                         System.out.println("Connexion reussie");
                     } else {
                         System.out.println("Identifiants incorrects");

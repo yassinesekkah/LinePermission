@@ -81,6 +81,43 @@ public class FichierDao extends AbstractDao<Fichier> {
         return Optional.empty();
     }
 
+    public Optional<Fichier> findByName(String name){
+
+        String sql = """
+                    SELECT * FROM fichiers
+                    WHERE name = ?;
+                """;
+
+        try(PreparedStatement statement = con.prepareStatement(sql)){
+
+            statement.setString(1, name);
+            ResultSet result = statement.executeQuery();
+
+            if(result.next()){
+                int id = result.getInt("id");
+                int ownerId = result.getInt("owner_id");
+                String permissionString = result.getString("permissions");
+
+                Optional<User> userOp = userDao.findById(ownerId);
+
+                if(userOp.isEmpty()){
+                    return Optional.empty();
+                }
+
+                User user = userOp.get();
+
+                boolean[] permissions = parsePermissions(permissionString);
+
+                Fichier fichier = new Fichier(id, name, user, permissions[0], permissions[1], permissions[2], permissions[3], permissions[4], permissions[5]);
+
+                return Optional.of(fichier);
+            }
+
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return Optional.empty();
+    }
     //tested
     private boolean[] parsePermissions(String permissions) {
 

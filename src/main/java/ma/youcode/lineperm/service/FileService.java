@@ -13,22 +13,25 @@ import ma.youcode.lineperm.model.Fichier;
 import ma.youcode.lineperm.model.Status;
 import ma.youcode.lineperm.model.User;
 import ma.youcode.lineperm.access.ControleAcces;
+import ma.youcode.lineperm.dao.FichierDao;
 
 public class FileService {
 
     private final LogService logService;
+    private final FichierDao fichierDao;
 
-    public FileService(LogService logService) {
+    public FileService(LogService logService, FichierDao fichierDao) {
         this.logService = logService;
+        this.fichierDao = fichierDao;
         // loadFiles();
     }
 
-    private Map<String, Fichier> files = new HashMap<>();
-    private final Path metadataPath = Path.of("data", "files.txt");
+    // private Map<String, Fichier> files = new HashMap<>();
+    // private final Path metadataPath = Path.of("data", "files.txt");
 
-    public boolean fileExists(String name) {
-        return files.containsKey(name);
-    }
+    // public boolean fileExists(String name) {
+    //     return fichierDao.fi;
+    // }
 
     public Fichier getFile(String name) {
 
