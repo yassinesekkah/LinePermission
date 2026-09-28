@@ -30,7 +30,7 @@ public class FileService {
     // private final Path metadataPath = Path.of("data", "files.txt");
 
     // public boolean fileExists(String name) {
-    //     return fichierDao.fi;
+    // return fichierDao.fi;
     // }
 
     public Fichier getFile(String name) {
@@ -47,7 +47,7 @@ public class FileService {
 
     public boolean createFile(String name, User owner) {
 
-        if(fichierDao.findByName(name).isPresent()){
+        if (fichierDao.findByName(name).isPresent()) {
             return false;
         }
 
@@ -55,17 +55,14 @@ public class FileService {
             return false;
         }
 
-        // Path dataDir = Path.of("data");
-        // Path filePath = dataDir.resolve(name);
+        Path dataDir = Path.of("data");
+        Path filePath = dataDir.resolve(name);
 
         try {
-            // Files.createDirectories(dataDir);
-            // Files.createFile(filePath);
+            Files.createDirectories(dataDir);
+            Files.createFile(filePath);
 
             Fichier fichier = new Fichier(name, owner);
-            // files.put(name, fichier);
-
-            // saveFiles();
             fichierDao.save(fichier);
 
             return true;
@@ -78,7 +75,7 @@ public class FileService {
 
     public Collection<Fichier> getAllFiles() { //////////////////////////////////////////////
 
-        return files.values();
+        return fichierDao.findAll();
     }
 
     public boolean writeFile(String fileName, String login, String newContent) {
@@ -91,7 +88,6 @@ public class FileService {
 
         if (!ControleAcces.estAutorise(login, fichier, 'w')) {
 
-            // log
             logService.logAction(
                     login,
                     fileName,
@@ -101,13 +97,12 @@ public class FileService {
             return false;
         }
 
-        Path dataDir = Path.of("data");
-        Path filePath = dataDir.resolve(fileName);
+        Path filePath = Path.of("data", fileName);
 
         try {
+
             Files.writeString(filePath, newContent);
 
-            // log
             logService.logAction(
                     login,
                     fileName,
@@ -115,10 +110,10 @@ public class FileService {
                     Status.OK);
 
             return true;
+
         } catch (IOException e) {
             return false;
         }
-
     }
 
     public String readFile(String fileName, String login) {
@@ -182,8 +177,7 @@ public class FileService {
             return false;
         }
 
-        if (!fichier.getOwner().equals(login)) {
-
+        if (!fichier.getOwner().getLogin().equals(login)) {
             return false;
         }
 
@@ -239,76 +233,79 @@ public class FileService {
             default:
                 break;
         }
-        saveFiles();
+        fichierDao.updatePermissions(
+                fichier.getId(),
+                fichier.getPermissionsDisplay());
 
         return true;
     }
 
-    private void saveFiles() {
+    // private void saveFiles() {
 
-        StringBuilder data = new StringBuilder();
+    // StringBuilder data = new StringBuilder();
 
-        for (Fichier fichier : files.values()) {
+    // for (Fichier fichier : files.values()) {
 
-            data.append(fichier.getName())
-                    .append(";")
-                    .append(fichier.getOwner())
-                    .append(";")
-                    .append(fichier.getPermissionsDisplay())
-                    .append("\n");
-        }
+    // data.append(fichier.getName())
+    // .append(";")
+    // .append(fichier.getOwner())
+    // .append(";")
+    // .append(fichier.getPermissionsDisplay())
+    // .append("\n");
+    // }
 
-        try {
-            Files.createDirectories(Path.of("data"));
-            Files.writeString(metadataPath, data.toString());
-        } catch (IOException e) {
+    // try {
+    // Files.createDirectories(Path.of("data"));
+    // Files.writeString(metadataPath, data.toString());
+    // } catch (IOException e) {
 
-        }
-    }
+    // }
+    // }
 
     // private void loadFiles() {
-    //     if (!Files.exists(metadataPath)) {
-    //         return;
-    //     }
-    //     List<String> lines;
-    //     try {
-    //         lines = Files.readAllLines(metadataPath);
-    //     } catch (IOException e) {
-    //         return;
-    //     }
+    // if (!Files.exists(metadataPath)) {
+    // return;
+    // }
+    // List<String> lines;
+    // try {
+    // lines = Files.readAllLines(metadataPath);
+    // } catch (IOException e) {
+    // return;
+    // }
 
-    //     for (String line : lines) {
-    //         String[] parts = line.split(";");
+    // for (String line : lines) {
+    // String[] parts = line.split(";");
 
-    //         if (parts.length != 3) {
-    //             continue;
-    //         }
+    // if (parts.length != 3) {
+    // continue;
+    // }
 
-    //         String fileName = parts[0];
-    //         String owner = parts[1];
-    //         String[] permission = parts[2].split("\\|");
+    // String fileName = parts[0];
+    // String owner = parts[1];
+    // String[] permission = parts[2].split("\\|");
 
-    //         if (permission.length != 2) {
-    //             continue;
-    //         }
+    // if (permission.length != 2) {
+    // continue;
+    // }
 
-    //         String ownerPermission = permission[0];
-    //         String otherPermission = permission[1];
+    // String ownerPermission = permission[0];
+    // String otherPermission = permission[1];
 
-    //         boolean ownerCanRead = ownerPermission.charAt(0) == 'r';
-    //         boolean ownerCanWrite = ownerPermission.charAt(1) == 'w';
-    //         boolean ownerCanDelete = ownerPermission.charAt(2) == 'd';
+    // boolean ownerCanRead = ownerPermission.charAt(0) == 'r';
+    // boolean ownerCanWrite = ownerPermission.charAt(1) == 'w';
+    // boolean ownerCanDelete = ownerPermission.charAt(2) == 'd';
 
-    //         boolean othersCanRead = otherPermission.charAt(0) == 'r';
-    //         boolean othersCanWrite = otherPermission.charAt(1) == 'w';
-    //         boolean othersCanDelete = otherPermission.charAt(2) == 'd';
+    // boolean othersCanRead = otherPermission.charAt(0) == 'r';
+    // boolean othersCanWrite = otherPermission.charAt(1) == 'w';
+    // boolean othersCanDelete = otherPermission.charAt(2) == 'd';
 
-    //         FichierProtege fichier = new FichierProtege(fileName, owner, ownerCanRead, ownerCanWrite, ownerCanDelete,
-    //                 othersCanRead, othersCanWrite, othersCanDelete);
+    // FichierProtege fichier = new FichierProtege(fileName, owner, ownerCanRead,
+    // ownerCanWrite, ownerCanDelete,
+    // othersCanRead, othersCanWrite, othersCanDelete);
 
-    //         files.put(fileName, fichier);
-    //     }
-    //}
+    // files.put(fileName, fichier);
+    // }
+    // }
 
     public boolean deleteFile(String fileName, String login) {
 
@@ -320,7 +317,6 @@ public class FileService {
 
         if (!ControleAcces.estAutorise(login, fichier, 'd')) {
 
-            // log
             logService.logAction(
                     login,
                     fileName,
@@ -330,16 +326,17 @@ public class FileService {
             return false;
         }
 
-        Path dataDir = Path.of("data");
-        Path filePath = dataDir.resolve(fileName);
+        Path filePath = Path.of("data", fileName);
 
         try {
+
+            // supprimer le fichier physique
             Files.delete(filePath);
 
-            files.remove(fileName);
-            saveFiles();
+            // marquer le fichier comme supprimé dans la DB
+            fichierDao.softDelete(fichier.getId());
 
-            // log
+            // enregistrer le log
             logService.logAction(
                     login,
                     fileName,
