@@ -47,7 +47,7 @@ public class LogAnalyzer {
                         Collectors.counting()));
     }
 
-    public Map<String, Long> getTop3ConsultedFilesdhd() {
+    public Map<String, Long> getTop3ConsultedFiles() {
 
         Comparator<Map.Entry<String, Long>> comparator = Map.Entry.comparingByValue();
 

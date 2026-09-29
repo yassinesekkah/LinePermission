@@ -3,6 +3,7 @@ package ma.youcode.lineperm.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ public class FichierDao extends AbstractDao<Fichier> {
 
     public UserDao userDao = new UserDao();
 
-    //tested
+    // tested
     @Override
     public void save(Fichier fichier) {
 
@@ -38,7 +39,7 @@ public class FichierDao extends AbstractDao<Fichier> {
         }
     }
 
-    //tested
+    // tested
     @Override
     public Optional<Fichier> findById(int id) {
 
@@ -81,7 +82,94 @@ public class FichierDao extends AbstractDao<Fichier> {
         return Optional.empty();
     }
 
-    //tested
+    public Optional<Fichier> findByName(String name) {
+
+        String sql = """
+                SELECT * FROM fichiers
+                WHERE name = ?
+                AND deleted = 0;
+                                """;
+
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+
+            statement.setString(1, name);
+            ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                int id = result.getInt("id");
+                int ownerId = result.getInt("owner_id");
+                String permissionString = result.getString("permissions");
+
+                Optional<User> userOp = userDao.findById(ownerId);
+
+                if (userOp.isEmpty()) {
+                    return Optional.empty();
+                }
+
+                User user = userOp.get();
+
+                boolean[] permissions = parsePermissions(permissionString);
+
+                Fichier fichier = new Fichier(id, name, user, permissions[0], permissions[1], permissions[2],
+                        permissions[3], permissions[4], permissions[5]);
+
+                return Optional.of(fichier);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    public List<Fichier> findAll() {
+
+        String sql = """
+                SELECT * FROM fichiers
+                WHERE deleted = 0;
+                                """;
+
+        List<Fichier> fichiers = new ArrayList<>();
+
+        try (Statement statement = con.createStatement()) {
+
+            ResultSet result = statement.executeQuery(sql);
+
+            while (result.next()) {
+
+                int id = result.getInt("id");
+                String name = result.getString("name");
+                int ownerId = result.getInt("owner_id");
+                String permissionsString = result.getString("permissions");
+
+                // prepare owner
+                Optional<User> userOp = userDao.findById(ownerId);
+
+                if (userOp.isEmpty()) {
+                    continue;
+                }
+
+                User owner = userOp.get();
+
+                // prepare permissions
+                boolean[] permissions = parsePermissions(permissionsString);
+
+                // create fichier
+                Fichier fichier = new Fichier(id, name, owner, permissions[0], permissions[1], permissions[2],
+                        permissions[3], permissions[4], permissions[5]);
+
+                fichiers.add(fichier);
+
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return fichiers;
+    }
+
+    // tested
     private boolean[] parsePermissions(String permissions) {
 
         return new boolean[] {
@@ -94,12 +182,12 @@ public class FichierDao extends AbstractDao<Fichier> {
         };
     }
 
-    //tested
+    // tested
     public List<Fichier> findByOwner(int ownerId) {
 
         String sql = """
                     SELECT * FROM fichiers
-                    WHERE owner_id = ?;
+                    WHERE owner_id = ? AND deleted = 0;
                 """;
 
         List<Fichier> fichierList = new ArrayList<>();
@@ -140,7 +228,7 @@ public class FichierDao extends AbstractDao<Fichier> {
         return fichierList;
     }
 
-    //tested
+    // tested
     public void updatePermissions(int id, String permissions) {
 
         String sql = """
@@ -163,6 +251,24 @@ public class FichierDao extends AbstractDao<Fichier> {
 
         } catch (SQLException e) {
             System.out.println("Erreur lors de la modification des permissions");
+        }
+    }
+
+    public void softDelete(int id) {
+
+        String sql = """
+                UPDATE fichiers
+                SET deleted = 1
+                WHERE id = ?;
+                """;
+
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+
+            statement.setInt(1, id);
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

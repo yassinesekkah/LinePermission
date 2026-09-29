@@ -65,9 +65,10 @@ public class DBConnection {
         String sql = """
                         CREATE TABLE IF NOT EXISTS fichiers(
                     id  INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
+                    name TEXT NOT NULL UNIQUE,
                     owner_id INTEGER NOT NULL,
                     permissions TEXT NOT NULL,
+                    deleted INTEGER NOT NULL DEFAULT 0,
                     FOREIGN KEY (owner_id) REFERENCES users(id)
                 );
                         """;
