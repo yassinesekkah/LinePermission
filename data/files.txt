@@ -1,0 +1,3 @@
+test.txt;yassine;rwd|---
+test2.txt;ismail;rwd|---
+haya.txt;yassine;rwd|---

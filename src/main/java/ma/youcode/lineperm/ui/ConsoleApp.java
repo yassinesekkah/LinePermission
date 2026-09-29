@@ -65,7 +65,7 @@ public class ConsoleApp {
 
     private void cat() {
 
-        System.out.println("Nom du fichier : ");
+        System.out.print("Nom du fichier : ");
         String name = scanner.nextLine();
 
         FichierProtege file = fileService.getFile(name);
@@ -195,60 +195,62 @@ public class ConsoleApp {
 
     private void showStats() {
 
-        System.out.println("=== Statistiques ===");
-        System.out.println("1. Total actions");
-        System.out.println("2. Accès refusés");
-        System.out.println("3. Utilisateurs distincts");
-        System.out.println("4. Actions par utilisateur");
-        System.out.println("5. Top 3 fichiers consultés");
-        System.out.println("6. Accès refusés d'un utilisateur");
-        System.out.println("7. Utilisateur le plus actif");
-        System.out.println("8. Actions par type");
-        System.out.println("0. Retour");
+        while (true) {
+            System.out.println("=== Statistiques ===");
+            System.out.println("1. Total actions");
+            System.out.println("2. Acces refuses");
+            System.out.println("3. Utilisateurs distincts");
+            System.out.println("4. Actions par utilisateur");
+            System.out.println("5. Top 3 fichiers consultés");
+            System.out.println("6. Acces refuses d'un utilisateur");
+            System.out.println("7. Utilisateur le plus actif");
+            System.out.println("8. Actions par type");
+            System.out.println("0. Retour");
 
-        int choice = scanner.nextInt();
-        scanner.nextLine();
+            int choice = scanner.nextInt();
+            scanner.nextLine();
 
-        switch (choice) {
-            case 1:
-                System.out.println(logAnalyzer.countTotalActions());
-                break;
+            switch (choice) {
+                case 1:
+                    System.out.println(logAnalyzer.countTotalActions());
+                    break;
 
-            case 2:
-                System.out.println(logAnalyzer.countRefusedAccess());
-                break;
+                case 2:
+                    System.out.println(logAnalyzer.countRefusedAccess());
+                    break;
 
-            case 3:
-                System.out.println(logAnalyzer.countDistinctUsers());
-                break;
+                case 3:
+                    System.out.println(logAnalyzer.countDistinctUsers());
+                    break;
 
-            case 4:
-                System.out.println(logAnalyzer.countActionsByUser());
-                break;
+                case 4:
+                    System.out.println(logAnalyzer.countActionsByUser());
+                    break;
 
-            case 5:
-                System.out.println(logAnalyzer.getTop3ConsultedFiles());
-                break;
+                case 5:
+                    System.out.println(logAnalyzer.getTop3ConsultedFiles());
+                    break;
 
-            case 6:
-                showRefusedAccessByUser();
-                break;
+                case 6:
+                    showRefusedAccessByUser();
+                    break;
 
-            case 7:
-                System.out.println(
-                        logAnalyzer.getMostActiveUser()
-                                .orElse("Aucun utilisateur"));
-                break;
+                case 7:
+                    System.out.println(
+                            logAnalyzer.getMostActiveUser()
+                                    .orElse("Aucun utilisateur"));
+                    break;
 
-            case 8:
-                System.out.println(logAnalyzer.countActionByType());
-                break;
+                case 8:
+                    System.out.println(logAnalyzer.countActionByType());
+                    break;
 
-            case 0:
-                return;
+                case 0:
+                    return;
 
-            default:
-                System.out.println("Choix invalide");
+                default:
+                    System.out.println("Choix invalide");
+            }
         }
     }
 

@@ -17,7 +17,7 @@ import ma.youcode.lineperm.model.Status;
 
 public class LogService {
 
-    private List<AccessLog> logs = new ArrayList<>();
+    private final List<AccessLog> logs = new ArrayList<>();
 
     public LogService(){
         loadLogs();
@@ -72,7 +72,14 @@ public class LogService {
 
         String line = buildLogLine(user, fichier, action, status);
 
-        return writeLog(line);
+        AccessLog accessLog = parseLine(line).orElseThrow();
+
+        if (!writeLog(line)) {
+            return false;
+        }
+
+        logs.add(accessLog);
+        return true;
     }
 
     public Optional<AccessLog> parseLine(String line) {
@@ -130,17 +137,16 @@ public class LogService {
                 .map(optional -> optional.get())
                 .toList();
 
-            logs = loadedLogs;
+            logs.clear();
+            logs.addAll(loadedLogs);
 
-            
-            return logs;
-            
         }
         catch(IOException e){
-            logs = new ArrayList<>();
-            return logs;
+            logs.clear();
         }
+
+        return logs;
     }
 
-
+    
 }
